@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String   @id @default(cuid())
+  name           String
+  email          String   @unique
+  hashedPassword String
+  image          String?
+  bio            String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  bets      Bet[]
+  parlays   Parlay[]
+  followers Follow[] @relation("Following")
+  following Follow[] @relation("Follower")
+  likes     Like[]
+}
+
+model Bet {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  sport     String
+  league    String?
+  eventName String
+  eventDate DateTime
+
+  betType   String   // MONEYLINE, SPREAD, OVER_UNDER, LIVE
+  selection String
+  odds      Int      // American odds
+  stake     Float
+  potentialPayout Float
+
+  line      Float?
+  isLive    Boolean  @default(false)
+
+  result    String   @default("PENDING") // PENDING, WON, LOST, PUSH, VOID
+  profit    Float?
+
+  parlayId  String?
+  parlay    Parlay?  @relation(fields: [parlayId], references: [id], onDelete: SetNull)
+
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  likes     Like[]
+}
+
+model Parlay {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name            String?
+  totalOdds       Int
+  stake           Float
+  potentialPayout Float
+  isSameGame      Boolean  @default(false)
+  result          String   @default("PENDING")
+
+  legs            Bet[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+  follower    User     @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@unique([followerId, followingId])
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  userId    String
+  betId     String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bet       Bet      @relation(fields: [betId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, betId])
+}
