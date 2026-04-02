@@ -29,7 +29,7 @@ export default function NewBetPage() {
     router.push("/login");
     return null;
   }
-  if (status === "loading") return <div className="text-xs text-[#aaa] py-20">...</div>;
+  if (status === "loading") return <div className="text-[14px] text-[#555] py-20 text-center">...</div>;
   if (!session) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -49,7 +49,7 @@ export default function NewBetPage() {
     });
 
     if (!res.ok) {
-      setError("failed to create bet");
+      setError("Failed to create bet");
       setLoading(false);
       return;
     }
@@ -60,154 +60,88 @@ export default function NewBetPage() {
   const update = (field: string, value: string | boolean) =>
     setForm((f) => ({ ...f, [field]: value }));
 
+  const inputClass = "w-full bg-[#1a1a1a] rounded-xl px-4 py-3 text-[14px] border border-transparent focus:border-[#333]";
+
   return (
     <div className="max-w-lg mx-auto">
-      <h1 className="text-sm mb-8">new bet</h1>
+      <h1 className="text-xl font-semibold mb-8">New Bet</h1>
 
-      {error && <div className="text-[11px] text-[#999] mb-6">{error}</div>}
+      {error && <div className="text-[13px] text-[#f87171] bg-[#2e1a1a] rounded-xl px-4 py-3 mb-6">{error}</div>}
 
-      <form onSubmit={handleSubmit} className="space-y-5">
-        <div className="grid grid-cols-2 gap-6">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-[10px] uppercase tracking-widest text-[#aaa] mb-2">sport</label>
-            <select
-              value={form.sport}
-              onChange={(e) => update("sport", e.target.value)}
-              className="w-full border-b bg-transparent pb-2 text-xs"
-            >
-              {SPORTS.map((s) => (
-                <option key={s} value={s}>{s}</option>
-              ))}
+            <label className="block text-[12px] text-[#555] mb-2">Sport</label>
+            <select value={form.sport} onChange={(e) => update("sport", e.target.value)} className={inputClass}>
+              {SPORTS.map((s) => <option key={s} value={s}>{s}</option>)}
             </select>
           </div>
           <div>
-            <label className="block text-[10px] uppercase tracking-widest text-[#aaa] mb-2">league</label>
-            <input
-              type="text"
-              value={form.league}
-              onChange={(e) => update("league", e.target.value)}
-              className="w-full border-b bg-transparent pb-2 text-xs"
-              placeholder="optional"
-            />
+            <label className="block text-[12px] text-[#555] mb-2">League</label>
+            <input type="text" value={form.league} onChange={(e) => update("league", e.target.value)} className={inputClass} placeholder="Optional" />
           </div>
         </div>
 
         <div>
-          <label className="block text-[10px] uppercase tracking-widest text-[#aaa] mb-2">event</label>
-          <input
-            type="text"
-            value={form.eventName}
-            onChange={(e) => update("eventName", e.target.value)}
-            className="w-full border-b bg-transparent pb-2 text-xs"
-            placeholder="lakers vs celtics"
-            required
-          />
+          <label className="block text-[12px] text-[#555] mb-2">Event</label>
+          <input type="text" value={form.eventName} onChange={(e) => update("eventName", e.target.value)} className={inputClass} placeholder="Lakers vs Celtics" required />
         </div>
 
         <div>
-          <label className="block text-[10px] uppercase tracking-widest text-[#aaa] mb-2">event date</label>
-          <input
-            type="datetime-local"
-            value={form.eventDate}
-            onChange={(e) => update("eventDate", e.target.value)}
-            className="w-full border-b bg-transparent pb-2 text-xs"
-            required
-          />
+          <label className="block text-[12px] text-[#555] mb-2">Event Date</label>
+          <input type="datetime-local" value={form.eventDate} onChange={(e) => update("eventDate", e.target.value)} className={inputClass} required />
         </div>
 
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-[10px] uppercase tracking-widest text-[#aaa] mb-2">bet type</label>
-            <select
-              value={form.betType}
-              onChange={(e) => update("betType", e.target.value)}
-              className="w-full border-b bg-transparent pb-2 text-xs"
-            >
-              {BET_TYPES.map((bt) => (
-                <option key={bt.value} value={bt.value}>{bt.label}</option>
-              ))}
+            <label className="block text-[12px] text-[#555] mb-2">Bet Type</label>
+            <select value={form.betType} onChange={(e) => update("betType", e.target.value)} className={inputClass}>
+              {BET_TYPES.map((bt) => <option key={bt.value} value={bt.value}>{bt.label}</option>)}
             </select>
           </div>
           <div>
-            <label className="block text-[10px] uppercase tracking-widest text-[#aaa] mb-2">selection</label>
-            <input
-              type="text"
-              value={form.selection}
-              onChange={(e) => update("selection", e.target.value)}
-              className="w-full border-b bg-transparent pb-2 text-xs"
-              placeholder="lakers ml"
-              required
-            />
+            <label className="block text-[12px] text-[#555] mb-2">Selection</label>
+            <input type="text" value={form.selection} onChange={(e) => update("selection", e.target.value)} className={inputClass} placeholder="Lakers ML" required />
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-3 gap-3">
           <div>
-            <label className="block text-[10px] uppercase tracking-widest text-[#aaa] mb-2">odds</label>
-            <input
-              type="number"
-              value={form.odds}
-              onChange={(e) => update("odds", e.target.value)}
-              className="w-full border-b bg-transparent pb-2 text-xs"
-              placeholder="-110"
-              required
-            />
+            <label className="block text-[12px] text-[#555] mb-2">Odds</label>
+            <input type="number" value={form.odds} onChange={(e) => update("odds", e.target.value)} className={inputClass} placeholder="-110" required />
           </div>
           <div>
-            <label className="block text-[10px] uppercase tracking-widest text-[#aaa] mb-2">stake</label>
-            <input
-              type="number"
-              step="0.01"
-              value={form.stake}
-              onChange={(e) => update("stake", e.target.value)}
-              className="w-full border-b bg-transparent pb-2 text-xs"
-              placeholder="100"
-              required
-            />
+            <label className="block text-[12px] text-[#555] mb-2">Stake ($)</label>
+            <input type="number" step="0.01" value={form.stake} onChange={(e) => update("stake", e.target.value)} className={inputClass} placeholder="100" required />
           </div>
           <div>
-            <label className="block text-[10px] uppercase tracking-widest text-[#aaa] mb-2">line</label>
-            <input
-              type="number"
-              step="0.5"
-              value={form.line}
-              onChange={(e) => update("line", e.target.value)}
-              className="w-full border-b bg-transparent pb-2 text-xs"
-              placeholder="-3.5"
-            />
+            <label className="block text-[12px] text-[#555] mb-2">Line</label>
+            <input type="number" step="0.5" value={form.line} onChange={(e) => update("line", e.target.value)} className={inputClass} placeholder="-3.5" />
           </div>
         </div>
 
-        <div className="flex items-center gap-2 pt-1">
+        <div className="flex items-center gap-3 py-1">
           <input
             type="checkbox"
             id="isLive"
             checked={form.isLive}
             onChange={(e) => update("isLive", e.target.checked)}
-            className="accent-[#111]"
+            className="w-4 h-4 rounded accent-white"
           />
-          <label htmlFor="isLive" className="text-[10px] text-[#aaa]">
-            live bet
-          </label>
+          <label htmlFor="isLive" className="text-[13px] text-[#888]">Live bet</label>
         </div>
 
         <div>
-          <label className="block text-[10px] uppercase tracking-widest text-[#aaa] mb-2">notes</label>
-          <textarea
-            value={form.notes}
-            onChange={(e) => update("notes", e.target.value)}
-            className="w-full border-b bg-transparent pb-2 text-xs resize-none"
-            rows={2}
-            placeholder="optional"
-          />
+          <label className="block text-[12px] text-[#555] mb-2">Notes</label>
+          <textarea value={form.notes} onChange={(e) => update("notes", e.target.value)} className={`${inputClass} resize-none`} rows={2} placeholder="Optional" />
         </div>
 
         <button
           type="submit"
           disabled={loading}
-          className="text-xs text-[#111] underline underline-offset-4 hover:no-underline transition-all disabled:text-[#ccc] pt-4"
+          className="w-full bg-[#1a1a1a] hover:bg-[#222] text-white py-3 rounded-xl text-[14px] font-medium transition-all disabled:opacity-40 mt-2"
         >
-          {loading ? "..." : "log bet"}
+          {loading ? "..." : "Log Bet"}
         </button>
       </form>
     </div>

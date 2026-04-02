@@ -9,90 +9,84 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <nav className="border-b">
-      <div className="max-w-2xl mx-auto px-6">
-        <div className="flex justify-between items-center h-14">
-          <Link href="/" className="text-sm tracking-tight">
-            [tracker]
-          </Link>
+    <nav className="px-6 py-5">
+      <div className="max-w-3xl mx-auto flex justify-between items-center">
+        <Link href="/" className="text-base font-semibold tracking-tight">
+          [tracker]
+        </Link>
 
-          {session ? (
-            <>
-              <div className="hidden md:flex items-center gap-6 text-xs text-[#888]">
-                <Link href="/dashboard" className="hover:text-[#111] transition-colors">
-                  dashboard
-                </Link>
-                <Link href="/bets/new" className="hover:text-[#111] transition-colors">
-                  new bet
-                </Link>
-                <Link href="/parlays/new" className="hover:text-[#111] transition-colors">
-                  new parlay
-                </Link>
-                <Link href="/feed" className="hover:text-[#111] transition-colors">
-                  feed
-                </Link>
-                <Link href="/users" className="hover:text-[#111] transition-colors">
-                  people
-                </Link>
+        {session ? (
+          <>
+            <div className="hidden md:flex items-center gap-1">
+              {[
+                { href: "/dashboard", label: "Dashboard" },
+                { href: "/bets/new", label: "New Bet" },
+                { href: "/parlays/new", label: "Parlay" },
+                { href: "/feed", label: "Feed" },
+                { href: "/users", label: "People" },
+                { href: `/profile/${(session.user as { id: string }).id}`, label: "Profile" },
+              ].map((link) => (
                 <Link
-                  href={`/profile/${(session.user as { id: string }).id}`}
-                  className="hover:text-[#111] transition-colors"
+                  key={link.href}
+                  href={link.href}
+                  className="px-3 py-1.5 text-[13px] text-[#888] hover:text-white hover:bg-[#1a1a1a] rounded-full transition-all"
                 >
-                  profile
+                  {link.label}
                 </Link>
-                <button
-                  onClick={() => signOut()}
-                  className="hover:text-[#111] transition-colors"
-                >
-                  sign out
-                </button>
-              </div>
-
+              ))}
               <button
-                className="md:hidden text-xs text-[#888]"
-                onClick={() => setMenuOpen(!menuOpen)}
+                onClick={() => signOut()}
+                className="px-3 py-1.5 text-[13px] text-[#555] hover:text-white hover:bg-[#1a1a1a] rounded-full transition-all ml-1"
               >
-                {menuOpen ? "close" : "menu"}
+                Sign Out
               </button>
-            </>
-          ) : (
-            <div className="flex items-center gap-6 text-xs text-[#888]">
-              <Link href="/login" className="hover:text-[#111] transition-colors">
-                sign in
-              </Link>
-              <Link href="/register" className="hover:text-[#111] transition-colors">
-                sign up
-              </Link>
             </div>
-          )}
-        </div>
 
-        {menuOpen && session && (
-          <div className="md:hidden pb-6 flex flex-col gap-3 text-xs text-[#888]">
-            <Link href="/dashboard" className="hover:text-[#111]" onClick={() => setMenuOpen(false)}>
-              dashboard
-            </Link>
-            <Link href="/bets/new" className="hover:text-[#111]" onClick={() => setMenuOpen(false)}>
-              new bet
-            </Link>
-            <Link href="/parlays/new" className="hover:text-[#111]" onClick={() => setMenuOpen(false)}>
-              new parlay
-            </Link>
-            <Link href="/feed" className="hover:text-[#111]" onClick={() => setMenuOpen(false)}>
-              feed
-            </Link>
-            <Link href="/users" className="hover:text-[#111]" onClick={() => setMenuOpen(false)}>
-              people
-            </Link>
             <button
-              onClick={() => signOut()}
-              className="text-left hover:text-[#111]"
+              className="md:hidden text-[13px] text-[#888] bg-[#1a1a1a] px-4 py-1.5 rounded-full"
+              onClick={() => setMenuOpen(!menuOpen)}
             >
-              sign out
+              {menuOpen ? "Close" : "Menu"}
             </button>
+          </>
+        ) : (
+          <div className="flex items-center gap-2">
+            <Link href="/login" className="px-4 py-1.5 text-[13px] text-[#888] hover:text-white rounded-full transition-all">
+              Sign In
+            </Link>
+            <Link href="/register" className="px-4 py-1.5 text-[13px] text-white bg-[#1a1a1a] hover:bg-[#222] rounded-full transition-all">
+              Sign Up
+            </Link>
           </div>
         )}
       </div>
+
+      {menuOpen && session && (
+        <div className="md:hidden max-w-3xl mx-auto mt-4 flex flex-wrap gap-2">
+          {[
+            { href: "/dashboard", label: "Dashboard" },
+            { href: "/bets/new", label: "New Bet" },
+            { href: "/parlays/new", label: "Parlay" },
+            { href: "/feed", label: "Feed" },
+            { href: "/users", label: "People" },
+          ].map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="px-4 py-1.5 text-[13px] text-[#888] bg-[#1a1a1a] rounded-full"
+              onClick={() => setMenuOpen(false)}
+            >
+              {link.label}
+            </Link>
+          ))}
+          <button
+            onClick={() => signOut()}
+            className="px-4 py-1.5 text-[13px] text-[#555] bg-[#1a1a1a] rounded-full"
+          >
+            Sign Out
+          </button>
+        </div>
+      )}
     </nav>
   );
 }

@@ -67,18 +67,18 @@ export default function FeedPage() {
     if (status === "authenticated") fetchFeed();
   }, [status, router, fetchFeed]);
 
-  if (status === "loading" || loading) return <div className="text-xs text-[#aaa] py-20">...</div>;
+  if (status === "loading" || loading) return <div className="text-[14px] text-[#555] py-20 text-center">...</div>;
   if (!session) return null;
 
   return (
     <div>
-      <h1 className="text-sm mb-10">feed</h1>
+      <h1 className="text-xl font-semibold mb-8">Feed</h1>
 
       {feed.length === 0 ? (
-        <div className="py-16">
-          <p className="text-xs text-[#aaa] mb-4">your feed is empty. follow some bettors to see their picks.</p>
-          <Link href="/users" className="text-xs text-[#111] underline underline-offset-4 hover:no-underline">
-            find people
+        <div className="text-center py-20">
+          <p className="text-[14px] text-[#555] mb-4">Your feed is empty</p>
+          <Link href="/users" className="px-5 py-2 text-[13px] text-[#888] bg-[#1a1a1a] hover:bg-[#222] rounded-full transition-all">
+            Find People
           </Link>
         </div>
       ) : (

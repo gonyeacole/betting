@@ -96,7 +96,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
     fetchData();
   };
 
-  if (!user) return <div className="text-xs text-[#aaa] py-20">...</div>;
+  if (!user) return <div className="text-[14px] text-[#555] py-20 text-center">...</div>;
 
   const wonBets = bets.filter((b) => b.result === "WON").length;
   const lostBets = bets.filter((b) => b.result === "LOST").length;
@@ -105,52 +105,56 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
 
   return (
     <div>
-      <div className="mb-10">
+      <div className="bg-[#1a1a1a] rounded-2xl p-6 mb-6">
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-sm">{user.name}</h1>
-            {user.bio && <p className="text-xs text-[#888] mt-1">{user.bio}</p>}
-            <div className="flex gap-6 mt-3 text-[10px] text-[#aaa]">
-              <span>{user._count.followers} followers</span>
-              <span>{user._count.following} following</span>
-              <span>{user._count.bets} bets</span>
-              <span>{user._count.parlays} parlays</span>
+            <h1 className="text-xl font-semibold">{user.name}</h1>
+            {user.bio && <p className="text-[13px] text-[#888] mt-1">{user.bio}</p>}
+            <div className="flex gap-5 mt-3 text-[12px] text-[#555]">
+              <span><span className="text-white font-medium">{user._count.followers}</span> followers</span>
+              <span><span className="text-white font-medium">{user._count.following}</span> following</span>
+              <span><span className="text-white font-medium">{user._count.bets}</span> bets</span>
+              <span><span className="text-white font-medium">{user._count.parlays}</span> parlays</span>
             </div>
           </div>
           {myId && myId !== id && (
             <button
               onClick={toggleFollow}
-              className={`text-[10px] transition-colors ${
+              className={`px-5 py-1.5 text-[12px] rounded-full transition-all ${
                 isFollowing
-                  ? "text-[#ccc] hover:text-[#111]"
-                  : "text-[#111] underline underline-offset-2 hover:no-underline"
+                  ? "text-[#555] bg-[#222] hover:bg-[#2a2a2a]"
+                  : "text-white bg-[#333] hover:bg-[#444]"
               }`}
             >
-              {isFollowing ? "unfollow" : "follow"}
+              {isFollowing ? "Following" : "Follow"}
             </button>
           )}
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-6">
         <StatsCard label="Win Rate" value={`${winRate.toFixed(1)}%`} color={winRate >= 50 ? "text-green-600" : "text-red-600"} />
         <StatsCard label="Wins" value={wonBets} color="text-green-600" />
         <StatsCard label="Losses" value={lostBets} color="text-red-600" />
         <StatsCard label="Profit" value={totalProfit} color={totalProfit >= 0 ? "text-green-600" : "text-red-600"} />
       </div>
 
-      <div className="flex gap-6 mb-8 text-xs">
+      <div className="flex gap-2 mb-6">
         <button
           onClick={() => setTab("bets")}
-          className={`pb-1 ${tab === "bets" ? "text-[#111] border-b border-[#111]" : "text-[#aaa] hover:text-[#111]"} transition-colors`}
+          className={`px-4 py-1.5 text-[13px] rounded-full transition-all ${
+            tab === "bets" ? "bg-[#1a1a1a] text-white" : "text-[#555] hover:text-[#888]"
+          }`}
         >
-          bets ({bets.length})
+          Bets ({bets.length})
         </button>
         <button
           onClick={() => setTab("parlays")}
-          className={`pb-1 ${tab === "parlays" ? "text-[#111] border-b border-[#111]" : "text-[#aaa] hover:text-[#111]"} transition-colors`}
+          className={`px-4 py-1.5 text-[13px] rounded-full transition-all ${
+            tab === "parlays" ? "bg-[#1a1a1a] text-white" : "text-[#555] hover:text-[#888]"
+          }`}
         >
-          parlays ({parlays.length})
+          Parlays ({parlays.length})
         </button>
       </div>
 
@@ -159,14 +163,14 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
           {bets.map((bet) => (
             <BetCard key={bet.id} bet={bet} showUser={false} onUpdate={fetchData} />
           ))}
-          {bets.length === 0 && <p className="text-xs text-[#aaa] py-12">no bets yet</p>}
+          {bets.length === 0 && <p className="text-[14px] text-[#555] text-center py-16">No bets yet</p>}
         </div>
       ) : (
         <div>
           {parlays.map((parlay) => (
             <ParlayCard key={parlay.id} parlay={parlay} showUser={false} />
           ))}
-          {parlays.length === 0 && <p className="text-xs text-[#aaa] py-12">no parlays yet</p>}
+          {parlays.length === 0 && <p className="text-[14px] text-[#555] text-center py-16">No parlays yet</p>}
         </div>
       )}
     </div>

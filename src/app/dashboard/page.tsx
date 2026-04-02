@@ -66,7 +66,7 @@ export default function DashboardPage() {
     if (userId) fetchData();
   }, [status, userId, router, fetchData]);
 
-  if (status === "loading") return <div className="text-xs text-[#aaa] py-20">...</div>;
+  if (status === "loading") return <div className="text-[14px] text-[#555] py-20 text-center">...</div>;
   if (!session) return null;
 
   const totalBets = bets.length + parlays.length;
@@ -79,19 +79,19 @@ export default function DashboardPage() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-10">
-        <h1 className="text-sm">dashboard</h1>
-        <div className="flex gap-4 text-xs text-[#aaa]">
-          <Link href="/bets/new" className="hover:text-[#111] transition-colors">
-            + bet
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-xl font-semibold">Dashboard</h1>
+        <div className="flex gap-2">
+          <Link href="/bets/new" className="px-4 py-1.5 text-[13px] text-[#888] bg-[#1a1a1a] hover:bg-[#222] rounded-full transition-all">
+            + Bet
           </Link>
-          <Link href="/parlays/new" className="hover:text-[#111] transition-colors">
-            + parlay
+          <Link href="/parlays/new" className="px-4 py-1.5 text-[13px] text-[#888] bg-[#1a1a1a] hover:bg-[#222] rounded-full transition-all">
+            + Parlay
           </Link>
         </div>
       </div>
 
-      <div className="grid grid-cols-3 md:grid-cols-6 gap-6 mb-12">
+      <div className="grid grid-cols-3 md:grid-cols-6 gap-2 mb-8">
         <StatsCard label="Total" value={totalBets} />
         <StatsCard label="Win Rate" value={`${winRate.toFixed(1)}%`} color={winRate >= 50 ? "text-green-600" : "text-red-600"} />
         <StatsCard label="Wins" value={wonBets} color="text-green-600" />
@@ -100,30 +100,34 @@ export default function DashboardPage() {
         <StatsCard label="ROI" value={`${roi.toFixed(1)}%`} color={roi >= 0 ? "text-green-600" : "text-red-600"} />
       </div>
 
-      <div className="flex gap-6 mb-8 text-xs">
+      <div className="flex gap-2 mb-6">
         <button
           onClick={() => setTab("bets")}
-          className={`pb-1 ${tab === "bets" ? "text-[#111] border-b border-[#111]" : "text-[#aaa] hover:text-[#111]"} transition-colors`}
+          className={`px-4 py-1.5 text-[13px] rounded-full transition-all ${
+            tab === "bets" ? "bg-[#1a1a1a] text-white" : "text-[#555] hover:text-[#888]"
+          }`}
         >
-          bets ({bets.length})
+          Bets ({bets.length})
         </button>
         <button
           onClick={() => setTab("parlays")}
-          className={`pb-1 ${tab === "parlays" ? "text-[#111] border-b border-[#111]" : "text-[#aaa] hover:text-[#111]"} transition-colors`}
+          className={`px-4 py-1.5 text-[13px] rounded-full transition-all ${
+            tab === "parlays" ? "bg-[#1a1a1a] text-white" : "text-[#555] hover:text-[#888]"
+          }`}
         >
-          parlays ({parlays.length})
+          Parlays ({parlays.length})
         </button>
       </div>
 
       {tab === "bets" ? (
         <div>
           {bets.length === 0 ? (
-            <p className="text-xs text-[#aaa] py-12">
-              no bets yet.{" "}
-              <Link href="/bets/new" className="text-[#111] underline underline-offset-2 hover:no-underline">
-                place your first
+            <div className="text-center py-16">
+              <p className="text-[14px] text-[#555] mb-4">No bets yet</p>
+              <Link href="/bets/new" className="text-[13px] text-[#888] hover:text-white transition-colors">
+                Place your first bet
               </Link>
-            </p>
+            </div>
           ) : (
             bets.map((bet) => (
               <BetCard key={bet.id} bet={bet} showUser={false} onUpdate={fetchData} />
@@ -133,12 +137,12 @@ export default function DashboardPage() {
       ) : (
         <div>
           {parlays.length === 0 ? (
-            <p className="text-xs text-[#aaa] py-12">
-              no parlays yet.{" "}
-              <Link href="/parlays/new" className="text-[#111] underline underline-offset-2 hover:no-underline">
-                create your first
+            <div className="text-center py-16">
+              <p className="text-[14px] text-[#555] mb-4">No parlays yet</p>
+              <Link href="/parlays/new" className="text-[13px] text-[#888] hover:text-white transition-colors">
+                Create your first parlay
               </Link>
-            </p>
+            </div>
           ) : (
             parlays.map((parlay) => (
               <ParlayCard key={parlay.id} parlay={parlay} showUser={false} />

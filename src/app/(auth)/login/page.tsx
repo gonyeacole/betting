@@ -24,7 +24,7 @@ export default function LoginPage() {
     });
 
     if (result?.error) {
-      setError("invalid email or password");
+      setError("Invalid email or password");
       setLoading(false);
     } else {
       router.push("/dashboard");
@@ -32,49 +32,51 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-[70vh] flex flex-col justify-center max-w-sm mx-auto">
-      <h1 className="text-sm mb-8">sign in</h1>
+    <div className="min-h-[70vh] flex flex-col items-center justify-center">
+      <div className="w-full max-w-sm">
+        <h1 className="text-xl font-semibold text-center mb-8">Sign In</h1>
 
-      {error && (
-        <div className="text-[11px] text-[#999] mb-6">{error}</div>
-      )}
+        {error && (
+          <div className="text-[13px] text-[#f87171] bg-[#2e1a1a] rounded-xl px-4 py-3 mb-6">{error}</div>
+        )}
 
-      <form onSubmit={handleSubmit} className="space-y-5">
-        <div>
-          <label className="block text-[10px] uppercase tracking-widest text-[#aaa] mb-2">email</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full border-b bg-transparent pb-2 text-xs focus:border-[#111]"
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-[10px] uppercase tracking-widest text-[#aaa] mb-2">password</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full border-b bg-transparent pb-2 text-xs focus:border-[#111]"
-            required
-          />
-        </div>
-        <button
-          type="submit"
-          disabled={loading}
-          className="text-xs text-[#111] underline underline-offset-4 hover:no-underline transition-all disabled:text-[#ccc] pt-2"
-        >
-          {loading ? "..." : "sign in"}
-        </button>
-      </form>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-[12px] text-[#555] mb-2">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full bg-[#1a1a1a] rounded-xl px-4 py-3 text-[14px] border border-transparent focus:border-[#333]"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-[12px] text-[#555] mb-2">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full bg-[#1a1a1a] rounded-xl px-4 py-3 text-[14px] border border-transparent focus:border-[#333]"
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-[#1a1a1a] hover:bg-[#222] text-white py-3 rounded-xl text-[14px] font-medium transition-all disabled:opacity-40 mt-2"
+          >
+            {loading ? "..." : "Sign In"}
+          </button>
+        </form>
 
-      <p className="text-[10px] text-[#aaa] mt-12">
-        no account?{" "}
-        <Link href="/register" className="text-[#111] underline underline-offset-2 hover:no-underline">
-          sign up
-        </Link>
-      </p>
+        <p className="text-center text-[13px] text-[#555] mt-8">
+          No account?{" "}
+          <Link href="/register" className="text-[#888] hover:text-white transition-colors">
+            Sign Up
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }
