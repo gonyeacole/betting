@@ -22,8 +22,8 @@ export function resultColor(result: string): string {
     case "WON": return "text-success bg-success/10";
     case "LOST": return "text-danger bg-danger/10";
     case "PUSH": return "text-warning bg-warning/10";
-    case "VOID": return "text-muted bg-white/5";
-    default: return "text-muted bg-white/5";
+    case "VOID": return "text-[rgba(255,255,255,0.4)] bg-[rgba(255,255,255,0.04)]";
+    default: return "text-[rgba(255,255,255,0.4)] bg-[rgba(255,255,255,0.04)]";
   }
 }
 

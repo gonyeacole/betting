@@ -9,45 +9,18 @@ import ParlayCard from "@/components/ParlayCard";
 
 type FeedItem =
   | ({ _type: "bet" } & {
-      id: string;
-      sport: string;
-      league?: string | null;
-      eventName: string;
-      eventDate: string;
-      betType: string;
-      selection: string;
-      odds: number;
-      stake: number;
-      potentialPayout: number;
-      line?: number | null;
-      isLive: boolean;
-      result: string;
-      profit?: number | null;
-      notes?: string | null;
-      createdAt: string;
-      user: { id: string; name: string; image?: string | null };
+      id: string; sport: string; league?: string | null; eventName: string; eventDate: string;
+      betType: string; selection: string; odds: number; stake: number; potentialPayout: number;
+      line?: number | null; isLive: boolean; result: string; profit?: number | null;
+      notes?: string | null; createdAt: string; user: { id: string; name: string; image?: string | null };
       likes: { id: string; userId: string }[];
     })
   | ({ _type: "parlay" } & {
-      id: string;
-      name?: string | null;
-      totalOdds: number;
-      stake: number;
-      potentialPayout: number;
-      isSameGame: boolean;
-      result: string;
-      createdAt: string;
+      id: string; name?: string | null; totalOdds: number; stake: number; potentialPayout: number;
+      isSameGame: boolean; result: string; createdAt: string;
       user: { id: string; name: string; image?: string | null };
-      legs: {
-        id: string;
-        sport: string;
-        eventName: string;
-        betType: string;
-        selection: string;
-        odds: number;
-        line?: number | null;
-        result: string;
-      }[];
+      legs: { id: string; sport: string; eventName: string; betType: string; selection: string;
+        odds: number; line?: number | null; result: string; }[];
     });
 
 export default function FeedPage() {
@@ -67,18 +40,18 @@ export default function FeedPage() {
     if (status === "authenticated") fetchFeed();
   }, [status, router, fetchFeed]);
 
-  if (status === "loading" || loading) return <div className="text-center py-20 text-muted">loading...</div>;
+  if (status === "loading" || loading) return <div className="text-center py-20 text-[rgba(255,255,255,0.3)] font-light">loading...</div>;
   if (!session) return null;
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <h1 className="text-2xl font-semibold mb-6">feed</h1>
+    <div className="max-w-2xl mx-auto animate-in">
+      <h1 className="text-3xl font-light text-gradient mb-8">feed</h1>
 
       {feed.length === 0 ? (
-        <div className="text-center py-16 bg-card border border-border rounded-2xl">
-          <p className="text-muted mb-4 text-sm">your feed is empty. follow some bettors to see their picks.</p>
-          <Link href="/users" className="text-sm text-foreground bg-white/10 hover:bg-white/15 px-5 py-2 rounded-full transition-colors">
-            find users
+        <div className="text-center py-20 glass rounded-4xl">
+          <p className="text-[rgba(255,255,255,0.3)] mb-6 text-sm font-light">your feed is empty. follow some bettors to see their picks.</p>
+          <Link href="/users" className="btn-glow text-xs px-6 py-2.5 rounded-full inline-block">
+            discover bettors
           </Link>
         </div>
       ) : (

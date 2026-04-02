@@ -66,7 +66,7 @@ export default function DashboardPage() {
     if (userId) fetchData();
   }, [status, userId, router, fetchData]);
 
-  if (status === "loading") return <div className="text-center py-20 text-muted">loading...</div>;
+  if (status === "loading") return <div className="text-center py-20 text-[rgba(255,255,255,0.3)] font-light">loading...</div>;
   if (!session) return null;
 
   const totalBets = bets.length + parlays.length;
@@ -78,20 +78,16 @@ export default function DashboardPage() {
   const roi = totalStaked > 0 ? (totalProfit / totalStaked) * 100 : 0;
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl font-semibold">dashboard</h1>
+    <div className="animate-in">
+      <div className="flex justify-between items-center mb-10">
+        <h1 className="text-3xl font-light text-gradient">dashboard</h1>
         <div className="flex gap-3">
-          <Link href="/bets/new" className="text-sm text-foreground bg-white/10 hover:bg-white/15 px-4 py-2 rounded-full transition-colors">
-            new bet
-          </Link>
-          <Link href="/parlays/new" className="text-sm text-foreground bg-white/10 hover:bg-white/15 px-4 py-2 rounded-full transition-colors">
-            new parlay
-          </Link>
+          <Link href="/bets/new" className="btn-ghost text-xs px-5 py-2 rounded-full">new bet</Link>
+          <Link href="/parlays/new" className="btn-glow text-xs px-5 py-2 rounded-full">new parlay</Link>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-10">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-12">
         <StatsCard label="Total Bets" value={totalBets} />
         <StatsCard label="Win Rate" value={`${winRate.toFixed(1)}%`} color={winRate >= 50 ? "text-success" : "text-danger"} />
         <StatsCard label="Wins" value={wonBets} color="text-success" />
@@ -100,50 +96,39 @@ export default function DashboardPage() {
         <StatsCard label="ROI" value={`${roi.toFixed(1)}%`} color={roi >= 0 ? "text-success" : "text-danger"} />
       </div>
 
-      <div className="flex gap-6 mb-6 border-b border-border">
-        <button
-          onClick={() => setTab("bets")}
-          className={`pb-3 text-sm font-medium transition-colors ${tab === "bets" ? "border-b border-foreground text-foreground" : "text-muted hover:text-foreground"}`}
-        >
-          bets ({bets.length})
-        </button>
-        <button
-          onClick={() => setTab("parlays")}
-          className={`pb-3 text-sm font-medium transition-colors ${tab === "parlays" ? "border-b border-foreground text-foreground" : "text-muted hover:text-foreground"}`}
-        >
-          parlays ({parlays.length})
-        </button>
+      <div className="flex gap-8 mb-8">
+        {(["bets", "parlays"] as const).map((t) => (
+          <button
+            key={t}
+            onClick={() => setTab(t)}
+            className={`pb-3 text-sm font-light transition-all duration-300 border-b ${
+              tab === t
+                ? "border-[rgba(99,102,241,0.5)] text-foreground"
+                : "border-transparent text-[rgba(255,255,255,0.25)] hover:text-foreground"
+            }`}
+          >
+            {t} ({t === "bets" ? bets.length : parlays.length})
+          </button>
+        ))}
       </div>
 
       {tab === "bets" ? (
         <div className="grid md:grid-cols-2 gap-4">
           {bets.length === 0 ? (
-            <p className="text-muted col-span-2 text-center py-10 text-sm">
+            <p className="text-[rgba(255,255,255,0.25)] col-span-2 text-center py-16 text-sm font-light">
               no bets yet.{" "}
-              <Link href="/bets/new" className="text-foreground hover:opacity-70 transition-opacity">
-                place your first bet
-              </Link>
+              <Link href="/bets/new" className="text-foreground hover:opacity-70">place your first bet</Link>
             </p>
-          ) : (
-            bets.map((bet) => (
-              <BetCard key={bet.id} bet={bet} showUser={false} onUpdate={fetchData} />
-            ))
-          )}
+          ) : bets.map((bet) => <BetCard key={bet.id} bet={bet} showUser={false} onUpdate={fetchData} />)}
         </div>
       ) : (
         <div className="space-y-4">
           {parlays.length === 0 ? (
-            <p className="text-muted text-center py-10 text-sm">
+            <p className="text-[rgba(255,255,255,0.25)] text-center py-16 text-sm font-light">
               no parlays yet.{" "}
-              <Link href="/parlays/new" className="text-foreground hover:opacity-70 transition-opacity">
-                create your first parlay
-              </Link>
+              <Link href="/parlays/new" className="text-foreground hover:opacity-70">create your first parlay</Link>
             </p>
-          ) : (
-            parlays.map((parlay) => (
-              <ParlayCard key={parlay.id} parlay={parlay} showUser={false} />
-            ))
-          )}
+          ) : parlays.map((parlay) => <ParlayCard key={parlay.id} parlay={parlay} showUser={false} />)}
         </div>
       )}
     </div>

@@ -15,10 +15,10 @@ export default function StatsCard({ label, value, subtext, color = "text-foregro
     : value;
 
   return (
-    <div className="bg-card border border-border rounded-2xl p-5">
-      <p className="text-xs text-muted uppercase tracking-wider mb-2">{label}</p>
-      <p className={`text-2xl font-semibold ${color}`}>{displayValue}</p>
-      {subtext && <p className="text-xs text-muted mt-1">{subtext}</p>}
+    <div className="glass rounded-3xl p-5">
+      <p className="text-[10px] text-[rgba(255,255,255,0.3)] uppercase tracking-[0.2em] mb-2">{label}</p>
+      <p className={`text-2xl font-light ${color}`}>{displayValue}</p>
+      {subtext && <p className="text-xs text-[rgba(255,255,255,0.25)] mt-1">{subtext}</p>}
     </div>
   );
 }

@@ -15,10 +15,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="antialiased bg-background text-foreground">
+      <body className="antialiased min-h-screen relative">
         <SessionProvider>
           <Navbar />
-          <main className="max-w-6xl mx-auto px-6 py-8">{children}</main>
+          <main className="max-w-6xl mx-auto px-6 pt-24 pb-12 relative z-10">{children}</main>
         </SessionProvider>
       </body>
     </html>

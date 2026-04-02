@@ -30,36 +30,36 @@ interface ParlayCardProps {
 
 export default function ParlayCard({ parlay, showUser = true }: ParlayCardProps) {
   return (
-    <div className="bg-card border border-border rounded-2xl p-5 hover:border-subtle transition-colors">
+    <div className="glass rounded-3xl p-5 group">
       <div className="flex justify-between items-start mb-4">
         <div>
           {showUser && (
-            <Link href={`/profile/${parlay.user.id}`} className="text-sm text-muted hover:text-foreground transition-colors">
+            <Link href={`/profile/${parlay.user.id}`} className="text-xs text-[rgba(255,255,255,0.3)] hover:text-foreground transition-all duration-300">
               {parlay.user.name}
             </Link>
           )}
-          <h3 className="font-medium text-foreground">
+          <h3 className="font-medium text-foreground text-sm">
             {parlay.isSameGame ? "same game parlay" : "parlay"} ({parlay.legs.length} legs)
           </h3>
-          {parlay.name && <p className="text-sm text-muted">{parlay.name}</p>}
+          {parlay.name && <p className="text-xs text-[rgba(255,255,255,0.3)] font-light">{parlay.name}</p>}
         </div>
-        <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${resultColor(parlay.result)}`}>
+        <span className={`text-[10px] font-medium px-3 py-1 rounded-full ${resultColor(parlay.result)}`}>
           {parlay.result.toLowerCase()}
         </span>
       </div>
 
       <div className="space-y-0 mb-4">
         {parlay.legs.map((leg) => (
-          <div key={leg.id} className="flex items-center justify-between bg-white/[0.03] rounded-lg p-2.5 text-sm border-b border-border last:border-0">
+          <div key={leg.id} className="flex items-center justify-between py-2.5 text-sm border-b border-[rgba(255,255,255,0.04)] last:border-0">
             <div>
-              <span className="text-foreground font-medium">{leg.eventName}</span>
-              <span className="text-muted ml-2 text-xs">{betTypeLabel(leg.betType)}</span>
+              <span className="text-foreground font-light">{leg.eventName}</span>
+              <span className="text-[rgba(255,255,255,0.2)] ml-2 text-[10px]">{betTypeLabel(leg.betType)}</span>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-foreground">{leg.selection}</span>
-              {leg.line != null && <span className="text-muted text-xs">({leg.line > 0 ? "+" : ""}{leg.line})</span>}
-              <span className="text-muted text-xs">{formatOdds(leg.odds)}</span>
-              <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${resultColor(leg.result)}`}>
+              <span className="text-foreground text-xs font-light">{leg.selection}</span>
+              {leg.line != null && <span className="text-[rgba(255,255,255,0.2)] text-[10px]">({leg.line > 0 ? "+" : ""}{leg.line})</span>}
+              <span className="text-[rgba(255,255,255,0.25)] text-[10px]">{formatOdds(leg.odds)}</span>
+              <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${resultColor(leg.result)}`}>
                 {leg.result.toLowerCase()}
               </span>
             </div>
@@ -67,18 +67,20 @@ export default function ParlayCard({ parlay, showUser = true }: ParlayCardProps)
         ))}
       </div>
 
-      <div className="flex items-center gap-6 text-sm border-t border-border pt-3">
+      <div className="divider-gradient mb-3" />
+
+      <div className="flex items-center gap-6 text-sm">
         <div>
-          <span className="text-muted">odds </span>
-          <span className="text-foreground font-medium">{formatOdds(parlay.totalOdds)}</span>
+          <span className="text-[rgba(255,255,255,0.25)] text-xs">odds </span>
+          <span className="text-foreground font-light">{formatOdds(parlay.totalOdds)}</span>
         </div>
         <div>
-          <span className="text-muted">stake </span>
-          <span className="text-foreground font-medium">{formatMoney(parlay.stake)}</span>
+          <span className="text-[rgba(255,255,255,0.25)] text-xs">stake </span>
+          <span className="text-foreground font-light">{formatMoney(parlay.stake)}</span>
         </div>
         <div>
-          <span className="text-muted">to win </span>
-          <span className="text-foreground font-medium">{formatMoney(parlay.potentialPayout - parlay.stake)}</span>
+          <span className="text-[rgba(255,255,255,0.25)] text-xs">to win </span>
+          <span className="text-foreground font-light">{formatMoney(parlay.potentialPayout - parlay.stake)}</span>
         </div>
       </div>
     </div>
