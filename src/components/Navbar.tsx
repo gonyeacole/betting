@@ -13,7 +13,7 @@ export default function Navbar() {
       <div className="max-w-6xl mx-auto px-6">
         <div className="flex justify-between items-center h-14">
           <Link href="/" className="text-base font-semibold tracking-tight text-foreground">
-            bettracker
+            [tracker]
           </Link>
 
           {session ? (

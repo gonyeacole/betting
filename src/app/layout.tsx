@@ -4,7 +4,7 @@ import SessionProvider from "@/components/SessionProvider";
 import Navbar from "@/components/Navbar";
 
 export const metadata: Metadata = {
-  title: "BetTracker",
+  title: "[tracker]",
   description: "Track your sports bets, follow other bettors, and analyze your performance",
 };
 
