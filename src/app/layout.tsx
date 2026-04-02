@@ -4,11 +4,6 @@ import "./globals.css";
 import SessionProvider from "@/components/SessionProvider";
 import Navbar from "@/components/Navbar";
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
 const geistMono = localFont({
   src: "./fonts/GeistMonoVF.woff",
   variable: "--font-geist-mono",
@@ -16,8 +11,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "BetTracker - Sports Betting Tracker",
-  description: "Track your sports bets, follow other bettors, and analyze your performance",
+  title: "bettracker",
+  description: "track your bets",
 };
 
 export default function RootLayout({
@@ -27,10 +22,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50`}>
+      <body className={`${geistMono.variable} antialiased`} style={{ fontFamily: 'var(--font-geist-mono), monospace' }}>
         <SessionProvider>
           <Navbar />
-          <main className="max-w-7xl mx-auto px-4 py-6">{children}</main>
+          <main className="max-w-2xl mx-auto px-6 py-12">{children}</main>
         </SessionProvider>
       </body>
     </html>

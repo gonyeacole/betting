@@ -96,7 +96,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
     fetchData();
   };
 
-  if (!user) return <div className="text-center py-20">Loading...</div>;
+  if (!user) return <div className="text-xs text-[#aaa] py-20">...</div>;
 
   const wonBets = bets.filter((b) => b.result === "WON").length;
   const lostBets = bets.filter((b) => b.result === "LOST").length;
@@ -105,68 +105,68 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
 
   return (
     <div>
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+      <div className="mb-10">
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-3xl font-bold">{user.name}</h1>
-            {user.bio && <p className="text-gray-600 mt-1">{user.bio}</p>}
-            <div className="flex gap-6 mt-3 text-sm text-gray-500">
-              <span><strong className="text-gray-900">{user._count.followers}</strong> followers</span>
-              <span><strong className="text-gray-900">{user._count.following}</strong> following</span>
-              <span><strong className="text-gray-900">{user._count.bets}</strong> bets</span>
-              <span><strong className="text-gray-900">{user._count.parlays}</strong> parlays</span>
+            <h1 className="text-sm">{user.name}</h1>
+            {user.bio && <p className="text-xs text-[#888] mt-1">{user.bio}</p>}
+            <div className="flex gap-6 mt-3 text-[10px] text-[#aaa]">
+              <span>{user._count.followers} followers</span>
+              <span>{user._count.following} following</span>
+              <span>{user._count.bets} bets</span>
+              <span>{user._count.parlays} parlays</span>
             </div>
           </div>
           {myId && myId !== id && (
             <button
               onClick={toggleFollow}
-              className={`px-6 py-2 rounded-lg font-medium transition ${
+              className={`text-[10px] transition-colors ${
                 isFollowing
-                  ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                  : "bg-green-600 text-white hover:bg-green-700"
+                  ? "text-[#ccc] hover:text-[#111]"
+                  : "text-[#111] underline underline-offset-2 hover:no-underline"
               }`}
             >
-              {isFollowing ? "Unfollow" : "Follow"}
+              {isFollowing ? "unfollow" : "follow"}
             </button>
           )}
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
         <StatsCard label="Win Rate" value={`${winRate.toFixed(1)}%`} color={winRate >= 50 ? "text-green-600" : "text-red-600"} />
         <StatsCard label="Wins" value={wonBets} color="text-green-600" />
         <StatsCard label="Losses" value={lostBets} color="text-red-600" />
-        <StatsCard label="Total Profit" value={totalProfit} color={totalProfit >= 0 ? "text-green-600" : "text-red-600"} />
+        <StatsCard label="Profit" value={totalProfit} color={totalProfit >= 0 ? "text-green-600" : "text-red-600"} />
       </div>
 
-      <div className="flex gap-4 mb-4 border-b">
+      <div className="flex gap-6 mb-8 text-xs">
         <button
           onClick={() => setTab("bets")}
-          className={`pb-2 px-1 font-medium ${tab === "bets" ? "border-b-2 border-green-600 text-green-600" : "text-gray-500"}`}
+          className={`pb-1 ${tab === "bets" ? "text-[#111] border-b border-[#111]" : "text-[#aaa] hover:text-[#111]"} transition-colors`}
         >
-          Bets ({bets.length})
+          bets ({bets.length})
         </button>
         <button
           onClick={() => setTab("parlays")}
-          className={`pb-2 px-1 font-medium ${tab === "parlays" ? "border-b-2 border-green-600 text-green-600" : "text-gray-500"}`}
+          className={`pb-1 ${tab === "parlays" ? "text-[#111] border-b border-[#111]" : "text-[#aaa] hover:text-[#111]"} transition-colors`}
         >
-          Parlays ({parlays.length})
+          parlays ({parlays.length})
         </button>
       </div>
 
       {tab === "bets" ? (
-        <div className="grid md:grid-cols-2 gap-4">
+        <div>
           {bets.map((bet) => (
             <BetCard key={bet.id} bet={bet} showUser={false} onUpdate={fetchData} />
           ))}
-          {bets.length === 0 && <p className="text-gray-500 col-span-2 text-center py-10">No bets yet.</p>}
+          {bets.length === 0 && <p className="text-xs text-[#aaa] py-12">no bets yet</p>}
         </div>
       ) : (
-        <div className="space-y-4">
+        <div>
           {parlays.map((parlay) => (
             <ParlayCard key={parlay.id} parlay={parlay} showUser={false} />
           ))}
-          {parlays.length === 0 && <p className="text-gray-500 text-center py-10">No parlays yet.</p>}
+          {parlays.length === 0 && <p className="text-xs text-[#aaa] py-12">no parlays yet</p>}
         </div>
       )}
     </div>

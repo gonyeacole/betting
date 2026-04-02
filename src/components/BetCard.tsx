@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { formatOdds, formatMoney, resultColor, betTypeLabel } from "@/lib/utils";
+import { formatOdds, formatMoney, betTypeLabel } from "@/lib/utils";
 import { useState } from "react";
 
 interface BetCardProps {
@@ -29,6 +29,14 @@ interface BetCardProps {
   showUser?: boolean;
   onUpdate?: () => void;
 }
+
+const resultLabel = (r: string) => {
+  if (r === "WON") return "w";
+  if (r === "LOST") return "l";
+  if (r === "PUSH") return "p";
+  if (r === "VOID") return "v";
+  return "...";
+};
 
 export default function BetCard({ bet, showUser = true, onUpdate }: BetCardProps) {
   const { data: session } = useSession();
@@ -57,75 +65,69 @@ export default function BetCard({ bet, showUser = true, onUpdate }: BetCardProps
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-4 hover:shadow-lg transition">
-      <div className="flex justify-between items-start mb-3">
-        <div>
+    <div className="border-b pb-5 mb-5 last:border-0">
+      <div className="flex justify-between items-start mb-2">
+        <div className="space-y-0.5">
           {showUser && (
-            <Link href={`/profile/${bet.user.id}`} className="text-sm font-medium text-gray-600 hover:text-green-600">
+            <Link href={`/profile/${bet.user.id}`} className="text-[10px] text-[#aaa] hover:text-[#111] transition-colors">
               {bet.user.name}
             </Link>
           )}
-          <h3 className="font-bold text-lg text-gray-900">{bet.eventName}</h3>
-          <div className="flex gap-2 mt-1">
-            <span className="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full">{bet.sport}</span>
-            <span className="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full">
-              {betTypeLabel(bet.betType)}
-            </span>
-            {bet.isLive && (
-              <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-medium">LIVE</span>
-            )}
+          <h3 className="text-xs">{bet.eventName}</h3>
+          <div className="flex gap-3 text-[10px] text-[#aaa]">
+            <span>{bet.sport.toLowerCase()}</span>
+            <span>{betTypeLabel(bet.betType).toLowerCase()}</span>
+            {bet.isLive && <span>live</span>}
           </div>
         </div>
-        <span className={`text-xs font-bold px-2 py-1 rounded ${resultColor(bet.result)}`}>
-          {bet.result}
+        <span className={`text-[10px] ${bet.result === "WON" ? "text-[#111]" : bet.result === "LOST" ? "text-[#ccc]" : "text-[#aaa]"}`}>
+          {resultLabel(bet.result)}
         </span>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 text-sm mb-3">
+      <div className="grid grid-cols-2 gap-x-8 gap-y-1 text-[11px] text-[#666] mb-2">
         <div>
-          <span className="text-gray-500">Pick:</span>{" "}
-          <span className="font-semibold">{bet.selection}</span>
-          {bet.line != null && <span className="text-gray-500"> ({bet.line > 0 ? "+" : ""}{bet.line})</span>}
+          <span className="text-[#aaa]">pick </span>
+          {bet.selection}
+          {bet.line != null && <span className="text-[#aaa]"> ({bet.line > 0 ? "+" : ""}{bet.line})</span>}
         </div>
         <div>
-          <span className="text-gray-500">Odds:</span>{" "}
-          <span className="font-semibold">{formatOdds(bet.odds)}</span>
+          <span className="text-[#aaa]">odds </span>
+          {formatOdds(bet.odds)}
         </div>
         <div>
-          <span className="text-gray-500">Stake:</span>{" "}
-          <span className="font-semibold">{formatMoney(bet.stake)}</span>
+          <span className="text-[#aaa]">stake </span>
+          {formatMoney(bet.stake)}
         </div>
         <div>
-          <span className="text-gray-500">To Win:</span>{" "}
-          <span className="font-semibold text-green-600">{formatMoney(bet.potentialPayout - bet.stake)}</span>
+          <span className="text-[#aaa]">to win </span>
+          {formatMoney(bet.potentialPayout - bet.stake)}
         </div>
       </div>
 
       {bet.profit != null && (
-        <div className={`text-sm font-bold mb-2 ${bet.profit >= 0 ? "text-green-600" : "text-red-600"}`}>
-          P/L: {bet.profit >= 0 ? "+" : ""}{formatMoney(bet.profit)}
+        <div className={`text-[11px] mb-2 ${bet.profit >= 0 ? "text-[#111]" : "text-[#aaa]"}`}>
+          p/l {bet.profit >= 0 ? "+" : ""}{formatMoney(bet.profit)}
         </div>
       )}
 
-      {bet.notes && <p className="text-sm text-gray-500 mb-3 italic">&quot;{bet.notes}&quot;</p>}
+      {bet.notes && <p className="text-[10px] text-[#aaa] italic mb-2">{bet.notes}</p>}
 
-      <div className="flex items-center justify-between border-t pt-3">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between text-[10px] text-[#ccc]">
+        <div className="flex items-center gap-4">
           {session && (
-            <button onClick={toggleLike} className={`text-sm flex items-center gap-1 ${liked ? "text-red-500" : "text-gray-400"} hover:text-red-500 transition`}>
-              {liked ? "\u2764" : "\u2661"} {likeCount}
+            <button onClick={toggleLike} className={`hover:text-[#111] transition-colors ${liked ? "text-[#111]" : ""}`}>
+              {liked ? "+" : "+"}{likeCount > 0 ? ` ${likeCount}` : ""}
             </button>
           )}
-          <span className="text-xs text-gray-400">
-            {new Date(bet.eventDate).toLocaleDateString()}
-          </span>
+          <span>{new Date(bet.eventDate).toLocaleDateString()}</span>
         </div>
 
         {userId === bet.user.id && bet.result === "PENDING" && (
-          <div className="flex gap-1">
-            <button onClick={() => updateResult("WON")} className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded hover:bg-green-200">Won</button>
-            <button onClick={() => updateResult("LOST")} className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded hover:bg-red-200">Lost</button>
-            <button onClick={() => updateResult("PUSH")} className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded hover:bg-yellow-200">Push</button>
+          <div className="flex gap-3">
+            <button onClick={() => updateResult("WON")} className="hover:text-[#111] transition-colors">won</button>
+            <button onClick={() => updateResult("LOST")} className="hover:text-[#111] transition-colors">lost</button>
+            <button onClick={() => updateResult("PUSH")} className="hover:text-[#111] transition-colors">push</button>
           </div>
         )}
       </div>

@@ -29,7 +29,7 @@ export default function NewBetPage() {
     router.push("/login");
     return null;
   }
-  if (status === "loading") return <div className="text-center py-20">Loading...</div>;
+  if (status === "loading") return <div className="text-xs text-[#aaa] py-20">...</div>;
   if (!session) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -49,7 +49,7 @@ export default function NewBetPage() {
     });
 
     if (!res.ok) {
-      setError("Failed to create bet");
+      setError("failed to create bet");
       setLoading(false);
       return;
     }
@@ -61,19 +61,19 @@ export default function NewBetPage() {
     setForm((f) => ({ ...f, [field]: value }));
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">New Bet</h1>
+    <div className="max-w-lg mx-auto">
+      <h1 className="text-sm mb-8">new bet</h1>
 
-      {error && <div className="bg-red-50 text-red-700 p-3 rounded mb-4">{error}</div>}
+      {error && <div className="text-[11px] text-[#999] mb-6">{error}</div>}
 
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md space-y-4">
-        <div className="grid grid-cols-2 gap-4">
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="grid grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Sport</label>
+            <label className="block text-[10px] uppercase tracking-widest text-[#aaa] mb-2">sport</label>
             <select
               value={form.sport}
               onChange={(e) => update("sport", e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2"
+              className="w-full border-b bg-transparent pb-2 text-xs"
             >
               {SPORTS.map((s) => (
                 <option key={s} value={s}>{s}</option>
@@ -81,47 +81,47 @@ export default function NewBetPage() {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">League (optional)</label>
+            <label className="block text-[10px] uppercase tracking-widest text-[#aaa] mb-2">league</label>
             <input
               type="text"
               value={form.league}
               onChange={(e) => update("league", e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2"
-              placeholder="e.g. Premier League"
+              className="w-full border-b bg-transparent pb-2 text-xs"
+              placeholder="optional"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Event</label>
+          <label className="block text-[10px] uppercase tracking-widest text-[#aaa] mb-2">event</label>
           <input
             type="text"
             value={form.eventName}
             onChange={(e) => update("eventName", e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2"
-            placeholder="e.g. Lakers vs Celtics"
+            className="w-full border-b bg-transparent pb-2 text-xs"
+            placeholder="lakers vs celtics"
             required
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Event Date</label>
+          <label className="block text-[10px] uppercase tracking-widest text-[#aaa] mb-2">event date</label>
           <input
             type="datetime-local"
             value={form.eventDate}
             onChange={(e) => update("eventDate", e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2"
+            className="w-full border-b bg-transparent pb-2 text-xs"
             required
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Bet Type</label>
+            <label className="block text-[10px] uppercase tracking-widest text-[#aaa] mb-2">bet type</label>
             <select
               value={form.betType}
               onChange={(e) => update("betType", e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2"
+              className="w-full border-b bg-transparent pb-2 text-xs"
             >
               {BET_TYPES.map((bt) => (
                 <option key={bt.value} value={bt.value}>{bt.label}</option>
@@ -129,87 +129,85 @@ export default function NewBetPage() {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Selection</label>
+            <label className="block text-[10px] uppercase tracking-widest text-[#aaa] mb-2">selection</label>
             <input
               type="text"
               value={form.selection}
               onChange={(e) => update("selection", e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2"
-              placeholder="e.g. Lakers ML, Over 220.5"
+              className="w-full border-b bg-transparent pb-2 text-xs"
+              placeholder="lakers ml"
               required
             />
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Odds (American)</label>
+            <label className="block text-[10px] uppercase tracking-widest text-[#aaa] mb-2">odds</label>
             <input
               type="number"
               value={form.odds}
               onChange={(e) => update("odds", e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2"
+              className="w-full border-b bg-transparent pb-2 text-xs"
               placeholder="-110"
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Stake ($)</label>
+            <label className="block text-[10px] uppercase tracking-widest text-[#aaa] mb-2">stake</label>
             <input
               type="number"
               step="0.01"
               value={form.stake}
               onChange={(e) => update("stake", e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2"
+              className="w-full border-b bg-transparent pb-2 text-xs"
               placeholder="100"
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Line {form.betType === "SPREAD" ? "(Spread)" : form.betType === "OVER_UNDER" ? "(Total)" : "(optional)"}
-            </label>
+            <label className="block text-[10px] uppercase tracking-widest text-[#aaa] mb-2">line</label>
             <input
               type="number"
               step="0.5"
               value={form.line}
               onChange={(e) => update("line", e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2"
+              className="w-full border-b bg-transparent pb-2 text-xs"
               placeholder="-3.5"
             />
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 pt-1">
           <input
             type="checkbox"
             id="isLive"
             checked={form.isLive}
             onChange={(e) => update("isLive", e.target.checked)}
-            className="rounded"
+            className="accent-[#111]"
           />
-          <label htmlFor="isLive" className="text-sm font-medium text-gray-700">
-            This is a live/in-game bet
+          <label htmlFor="isLive" className="text-[10px] text-[#aaa]">
+            live bet
           </label>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Notes (optional)</label>
+          <label className="block text-[10px] uppercase tracking-widest text-[#aaa] mb-2">notes</label>
           <textarea
             value={form.notes}
             onChange={(e) => update("notes", e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2"
+            className="w-full border-b bg-transparent pb-2 text-xs resize-none"
             rows={2}
-            placeholder="Why you like this bet..."
+            placeholder="optional"
           />
         </div>
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold transition disabled:opacity-50"
+          className="text-xs text-[#111] underline underline-offset-4 hover:no-underline transition-all disabled:text-[#ccc] pt-4"
         >
-          {loading ? "Placing Bet..." : "Log Bet"}
+          {loading ? "..." : "log bet"}
         </button>
       </form>
     </div>

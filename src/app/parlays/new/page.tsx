@@ -41,7 +41,7 @@ export default function NewParlayPage() {
     router.push("/login");
     return null;
   }
-  if (status === "loading") return <div className="text-center py-20">Loading...</div>;
+  if (status === "loading") return <div className="text-xs text-[#aaa] py-20">...</div>;
   if (!session) return null;
 
   const updateLeg = (idx: number, field: string, value: string) => {
@@ -87,7 +87,7 @@ export default function NewParlayPage() {
     });
 
     if (!res.ok) {
-      setError("Failed to create parlay");
+      setError("failed to create parlay");
       setLoading(false);
       return;
     }
@@ -96,32 +96,32 @@ export default function NewParlayPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">New Parlay</h1>
+    <div className="max-w-lg mx-auto">
+      <h1 className="text-sm mb-8">new parlay</h1>
 
-      {error && <div className="bg-red-50 text-red-700 p-3 rounded mb-4">{error}</div>}
+      {error && <div className="text-[11px] text-[#999] mb-6">{error}</div>}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="bg-white p-6 rounded-lg shadow-md space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+      <form onSubmit={handleSubmit} className="space-y-8">
+        <div className="space-y-5">
+          <div className="grid grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Parlay Name (optional)</label>
+              <label className="block text-[10px] uppercase tracking-widest text-[#aaa] mb-2">name</label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                placeholder="My big parlay"
+                className="w-full border-b bg-transparent pb-2 text-xs"
+                placeholder="optional"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Total Stake ($)</label>
+              <label className="block text-[10px] uppercase tracking-widest text-[#aaa] mb-2">stake</label>
               <input
                 type="number"
                 step="0.01"
                 value={stake}
                 onChange={(e) => setStake(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                className="w-full border-b bg-transparent pb-2 text-xs"
                 required
               />
             </div>
@@ -133,42 +133,42 @@ export default function NewParlayPage() {
               id="isSameGame"
               checked={isSameGame}
               onChange={(e) => setIsSameGame(e.target.checked)}
-              className="rounded"
+              className="accent-[#111]"
             />
-            <label htmlFor="isSameGame" className="text-sm font-medium text-gray-700">
-              Same Game Parlay (SGP)
+            <label htmlFor="isSameGame" className="text-[10px] text-[#aaa]">
+              same game parlay
             </label>
           </div>
 
           {combinedOdds && (
-            <div className="text-lg font-bold text-green-600">
-              Combined Odds: {combinedOdds}
+            <div className="text-xs text-[#111]">
+              combined odds: {combinedOdds}
             </div>
           )}
         </div>
 
         {legs.map((leg, idx) => (
-          <div key={idx} className="bg-white p-6 rounded-lg shadow-md space-y-3">
+          <div key={idx} className="border-t pt-6 space-y-4">
             <div className="flex justify-between items-center">
-              <h3 className="font-bold text-gray-900">Leg {idx + 1}</h3>
+              <span className="text-[10px] uppercase tracking-widest text-[#aaa]">leg {idx + 1}</span>
               {legs.length > 2 && (
                 <button
                   type="button"
                   onClick={() => removeLeg(idx)}
-                  className="text-red-500 text-sm hover:underline"
+                  className="text-[10px] text-[#ccc] hover:text-[#111] transition-colors"
                 >
-                  Remove
+                  remove
                 </button>
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Sport</label>
+                <label className="block text-[10px] text-[#ccc] mb-1">sport</label>
                 <select
                   value={leg.sport}
                   onChange={(e) => updateLeg(idx, "sport", e.target.value)}
-                  className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm"
+                  className="w-full border-b bg-transparent pb-1 text-xs"
                 >
                   {SPORTS.map((s) => (
                     <option key={s} value={s}>{s}</option>
@@ -176,11 +176,11 @@ export default function NewParlayPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Bet Type</label>
+                <label className="block text-[10px] text-[#ccc] mb-1">bet type</label>
                 <select
                   value={leg.betType}
                   onChange={(e) => updateLeg(idx, "betType", e.target.value)}
-                  className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm"
+                  className="w-full border-b bg-transparent pb-1 text-xs"
                 >
                   {BET_TYPES.map((bt) => (
                     <option key={bt.value} value={bt.value}>{bt.label}</option>
@@ -190,59 +190,59 @@ export default function NewParlayPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Event</label>
+              <label className="block text-[10px] text-[#ccc] mb-1">event</label>
               <input
                 type="text"
                 value={leg.eventName}
                 onChange={(e) => updateLeg(idx, "eventName", e.target.value)}
-                className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm"
-                placeholder="Lakers vs Celtics"
+                className="w-full border-b bg-transparent pb-1 text-xs"
+                placeholder="lakers vs celtics"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Event Date</label>
+              <label className="block text-[10px] text-[#ccc] mb-1">event date</label>
               <input
                 type="datetime-local"
                 value={leg.eventDate}
                 onChange={(e) => updateLeg(idx, "eventDate", e.target.value)}
-                className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm"
+                className="w-full border-b bg-transparent pb-1 text-xs"
                 required
               />
             </div>
 
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Selection</label>
+                <label className="block text-[10px] text-[#ccc] mb-1">selection</label>
                 <input
                   type="text"
                   value={leg.selection}
                   onChange={(e) => updateLeg(idx, "selection", e.target.value)}
-                  className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm"
-                  placeholder="Lakers ML"
+                  className="w-full border-b bg-transparent pb-1 text-xs"
+                  placeholder="lakers ml"
                   required
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Odds</label>
+                <label className="block text-[10px] text-[#ccc] mb-1">odds</label>
                 <input
                   type="number"
                   value={leg.odds}
                   onChange={(e) => updateLeg(idx, "odds", e.target.value)}
-                  className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm"
+                  className="w-full border-b bg-transparent pb-1 text-xs"
                   placeholder="-110"
                   required
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Line</label>
+                <label className="block text-[10px] text-[#ccc] mb-1">line</label>
                 <input
                   type="number"
                   step="0.5"
                   value={leg.line}
                   onChange={(e) => updateLeg(idx, "line", e.target.value)}
-                  className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm"
+                  className="w-full border-b bg-transparent pb-1 text-xs"
                   placeholder="-3.5"
                 />
               </div>
@@ -253,17 +253,17 @@ export default function NewParlayPage() {
         <button
           type="button"
           onClick={addLeg}
-          className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-lg transition border border-dashed border-gray-300"
+          className="w-full text-xs text-[#aaa] hover:text-[#111] transition-colors border-t pt-4"
         >
-          + Add Leg
+          + add leg
         </button>
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition disabled:opacity-50"
+          className="text-xs text-[#111] underline underline-offset-4 hover:no-underline transition-all disabled:text-[#ccc]"
         >
-          {loading ? "Creating Parlay..." : "Log Parlay"}
+          {loading ? "..." : "log parlay"}
         </button>
       </form>
     </div>

@@ -7,18 +7,23 @@ interface StatsCardProps {
   color?: string;
 }
 
-export default function StatsCard({ label, value, subtext, color = "text-gray-900" }: StatsCardProps) {
+export default function StatsCard({ label, value, subtext, color }: StatsCardProps) {
   const displayValue = typeof value === "number" && label.toLowerCase().includes("profit")
     ? formatMoney(value)
     : typeof value === "number" && label.toLowerCase().includes("roi")
     ? `${value.toFixed(1)}%`
     : value;
 
+  const isPositive = color?.includes("green");
+  const isNegative = color?.includes("red");
+
   return (
-    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-4">
-      <p className="text-sm text-gray-500">{label}</p>
-      <p className={`text-2xl font-bold ${color}`}>{displayValue}</p>
-      {subtext && <p className="text-xs text-gray-400 mt-1">{subtext}</p>}
+    <div className="border-b pb-3">
+      <p className="text-[10px] uppercase tracking-widest text-[#aaa] mb-1">{label}</p>
+      <p className={`text-sm ${isPositive ? "text-[#222]" : isNegative ? "text-[#999]" : "text-[#111]"}`}>
+        {displayValue}
+      </p>
+      {subtext && <p className="text-[10px] text-[#ccc] mt-1">{subtext}</p>}
     </div>
   );
 }

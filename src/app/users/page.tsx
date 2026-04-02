@@ -60,45 +60,44 @@ export default function UsersPage() {
   if (!session) return null;
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">Find Bettors</h1>
+    <div>
+      <h1 className="text-sm mb-8">people</h1>
 
       <input
         type="text"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        placeholder="Search by name..."
-        className="w-full border border-gray-300 rounded-lg px-4 py-3 mb-6 focus:ring-2 focus:ring-green-500"
+        placeholder="search..."
+        className="w-full border-b bg-transparent pb-2 text-xs mb-10 focus:border-[#111]"
       />
 
-      <div className="space-y-3">
+      <div className="space-y-0">
         {users
           .filter((u) => u.id !== userId)
           .map((user) => (
             <div
               key={user.id}
-              className="bg-white rounded-lg shadow-md p-4 flex items-center justify-between"
+              className="flex items-center justify-between border-b py-4"
             >
               <div>
-                <Link href={`/profile/${user.id}`} className="font-bold text-lg hover:text-green-600">
+                <Link href={`/profile/${user.id}`} className="text-xs hover:underline">
                   {user.name}
                 </Link>
-                {user.bio && <p className="text-sm text-gray-500">{user.bio}</p>}
-                <div className="flex gap-4 text-sm text-gray-500 mt-1">
+                {user.bio && <p className="text-[10px] text-[#aaa] mt-0.5">{user.bio}</p>}
+                <div className="flex gap-4 text-[10px] text-[#ccc] mt-1">
                   <span>{user._count.bets} bets</span>
                   <span>{user._count.followers} followers</span>
-                  <span>{user._count.following} following</span>
                 </div>
               </div>
               <button
                 onClick={() => toggleFollow(user.id)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                className={`text-[10px] transition-colors ${
                   followingIds.has(user.id)
-                    ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                    : "bg-green-600 text-white hover:bg-green-700"
+                    ? "text-[#ccc] hover:text-[#111]"
+                    : "text-[#111] underline underline-offset-2 hover:no-underline"
                 }`}
               >
-                {followingIds.has(user.id) ? "Unfollow" : "Follow"}
+                {followingIds.has(user.id) ? "unfollow" : "follow"}
               </button>
             </div>
           ))}

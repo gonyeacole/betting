@@ -3,21 +3,36 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fafafa;
+  --foreground: #111;
+  --border: #e0e0e0;
+  --muted: #888;
+  --accent: #111;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  border-color: var(--border);
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-mono), 'SF Mono', 'Consolas', 'Liberation Mono', monospace;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: #111;
+  color: #fff;
+}
+
+input, select, textarea {
+  font-family: inherit;
+  outline: none;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: #111 !important;
 }
 
 @layer utilities {
