@@ -9,91 +9,91 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <nav className="bg-gray-900 text-white shadow-lg">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="flex justify-between items-center h-16">
-          <Link href="/" className="text-xl font-bold text-green-400 flex items-center gap-2">
-            <span className="text-2xl">&#9917;</span> BetTracker
+    <nav className="border-b border-border bg-background/80 backdrop-blur-md sticky top-0 z-50">
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="flex justify-between items-center h-14">
+          <Link href="/" className="text-base font-semibold tracking-tight text-foreground">
+            bettracker
           </Link>
 
           {session ? (
             <>
-              <div className="hidden md:flex items-center gap-6">
-                <Link href="/dashboard" className="hover:text-green-400 transition">
-                  Dashboard
+              <div className="hidden md:flex items-center gap-8">
+                <Link href="/dashboard" className="text-sm text-muted hover:text-foreground transition-colors">
+                  dashboard
                 </Link>
-                <Link href="/bets/new" className="hover:text-green-400 transition">
-                  New Bet
+                <Link href="/bets/new" className="text-sm text-muted hover:text-foreground transition-colors">
+                  new bet
                 </Link>
-                <Link href="/parlays/new" className="hover:text-green-400 transition">
-                  New Parlay
+                <Link href="/parlays/new" className="text-sm text-muted hover:text-foreground transition-colors">
+                  new parlay
                 </Link>
-                <Link href="/feed" className="hover:text-green-400 transition">
-                  Feed
+                <Link href="/feed" className="text-sm text-muted hover:text-foreground transition-colors">
+                  feed
                 </Link>
-                <Link href="/users" className="hover:text-green-400 transition">
-                  Find Users
+                <Link href="/users" className="text-sm text-muted hover:text-foreground transition-colors">
+                  find users
                 </Link>
                 <Link
                   href={`/profile/${(session.user as { id: string }).id}`}
-                  className="hover:text-green-400 transition"
+                  className="text-sm text-muted hover:text-foreground transition-colors"
                 >
-                  Profile
+                  profile
                 </Link>
                 <button
                   onClick={() => signOut()}
-                  className="bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded text-sm transition"
+                  className="text-sm text-muted hover:text-foreground transition-colors"
                 >
-                  Sign Out
+                  sign out
                 </button>
               </div>
 
               <button
-                className="md:hidden"
+                className="md:hidden text-muted"
                 onClick={() => setMenuOpen(!menuOpen)}
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
               </button>
             </>
           ) : (
-            <div className="flex items-center gap-4">
-              <Link href="/login" className="hover:text-green-400 transition">
-                Sign In
+            <div className="flex items-center gap-6">
+              <Link href="/login" className="text-sm text-muted hover:text-foreground transition-colors">
+                sign in
               </Link>
               <Link
                 href="/register"
-                className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded transition"
+                className="text-sm text-foreground bg-white/10 hover:bg-white/15 px-4 py-1.5 rounded-full transition-colors"
               >
-                Sign Up
+                sign up
               </Link>
             </div>
           )}
         </div>
 
         {menuOpen && session && (
-          <div className="md:hidden pb-4 space-y-2">
-            <Link href="/dashboard" className="block py-2 hover:text-green-400" onClick={() => setMenuOpen(false)}>
-              Dashboard
+          <div className="md:hidden pb-4 space-y-1 border-t border-border pt-3">
+            <Link href="/dashboard" className="block py-2 text-sm text-muted hover:text-foreground" onClick={() => setMenuOpen(false)}>
+              dashboard
             </Link>
-            <Link href="/bets/new" className="block py-2 hover:text-green-400" onClick={() => setMenuOpen(false)}>
-              New Bet
+            <Link href="/bets/new" className="block py-2 text-sm text-muted hover:text-foreground" onClick={() => setMenuOpen(false)}>
+              new bet
             </Link>
-            <Link href="/parlays/new" className="block py-2 hover:text-green-400" onClick={() => setMenuOpen(false)}>
-              New Parlay
+            <Link href="/parlays/new" className="block py-2 text-sm text-muted hover:text-foreground" onClick={() => setMenuOpen(false)}>
+              new parlay
             </Link>
-            <Link href="/feed" className="block py-2 hover:text-green-400" onClick={() => setMenuOpen(false)}>
-              Feed
+            <Link href="/feed" className="block py-2 text-sm text-muted hover:text-foreground" onClick={() => setMenuOpen(false)}>
+              feed
             </Link>
-            <Link href="/users" className="block py-2 hover:text-green-400" onClick={() => setMenuOpen(false)}>
-              Find Users
+            <Link href="/users" className="block py-2 text-sm text-muted hover:text-foreground" onClick={() => setMenuOpen(false)}>
+              find users
             </Link>
             <button
               onClick={() => signOut()}
-              className="bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded text-sm transition"
+              className="block py-2 text-sm text-muted hover:text-foreground"
             >
-              Sign Out
+              sign out
             </button>
           </div>
         )}

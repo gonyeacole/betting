@@ -3,45 +3,44 @@ import Link from "next/link";
 export default function Home() {
   return (
     <div className="min-h-[80vh] flex flex-col items-center justify-center text-center">
-      <h1 className="text-5xl font-bold text-gray-900 mb-4">
-        Track Every Bet.<br />
-        <span className="text-green-600">Every Sport.</span>
+      <p className="text-sm text-muted tracking-widest uppercase mb-6">sports betting tracker</p>
+      <h1 className="text-5xl md:text-6xl font-semibold tracking-tight text-foreground mb-4 leading-tight">
+        Track every bet.
       </h1>
-      <p className="text-xl text-gray-600 mb-8 max-w-2xl">
-        Log moneylines, spreads, over/unders, live bets, parlays, and same game parlays.
-        Follow other bettors and see how they&apos;re doing.
+      <p className="text-lg text-muted mb-10 max-w-lg leading-relaxed">
+        Log your bets, follow other bettors, and see how everyone&apos;s doing. Simple and clean.
       </p>
       <div className="flex gap-4">
         <Link
           href="/register"
-          className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg text-lg font-semibold transition"
+          className="bg-foreground text-background px-7 py-2.5 rounded-full text-sm font-medium hover:opacity-90 transition-opacity"
         >
-          Get Started
+          get started
         </Link>
         <Link
           href="/login"
-          className="bg-white hover:bg-gray-50 text-gray-900 border border-gray-300 px-8 py-3 rounded-lg text-lg font-semibold transition"
+          className="text-muted border border-border px-7 py-2.5 rounded-full text-sm font-medium hover:text-foreground hover:border-subtle transition-colors"
         >
-          Sign In
+          sign in
         </Link>
       </div>
 
-      <div className="mt-16 grid md:grid-cols-3 gap-8 max-w-4xl">
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-lg font-bold mb-2">All Bet Types</h3>
-          <p className="text-gray-600 text-sm">
+      <div className="mt-24 grid md:grid-cols-3 gap-6 max-w-3xl w-full">
+        <div className="bg-card border border-border p-6 rounded-2xl">
+          <h3 className="text-sm font-medium text-foreground mb-2">all bet types</h3>
+          <p className="text-muted text-sm leading-relaxed">
             Moneylines, spreads, over/unders, live bets, parlays, and same game parlays.
           </p>
         </div>
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-lg font-bold mb-2">Every Sport</h3>
-          <p className="text-gray-600 text-sm">
-            NFL, NBA, MLB, NHL, Soccer, Tennis, MMA, and more. Track bets across all sports.
+        <div className="bg-card border border-border p-6 rounded-2xl">
+          <h3 className="text-sm font-medium text-foreground mb-2">every sport</h3>
+          <p className="text-muted text-sm leading-relaxed">
+            NFL, NBA, MLB, NHL, Soccer, Tennis, MMA, and more.
           </p>
         </div>
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-lg font-bold mb-2">Social</h3>
-          <p className="text-gray-600 text-sm">
+        <div className="bg-card border border-border p-6 rounded-2xl">
+          <h3 className="text-sm font-medium text-foreground mb-2">social</h3>
+          <p className="text-muted text-sm leading-relaxed">
             Follow other bettors, see their picks, and build your network.
           </p>
         </div>

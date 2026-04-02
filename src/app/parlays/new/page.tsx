@@ -41,7 +41,7 @@ export default function NewParlayPage() {
     router.push("/login");
     return null;
   }
-  if (status === "loading") return <div className="text-center py-20">Loading...</div>;
+  if (status === "loading") return <div className="text-center py-20 text-muted">loading...</div>;
   if (!session) return null;
 
   const updateLeg = (idx: number, field: string, value: string) => {
@@ -95,156 +95,88 @@ export default function NewParlayPage() {
     router.push("/dashboard");
   };
 
+  const inputClass = "w-full bg-background border border-border rounded-xl px-3 py-2 text-foreground text-sm placeholder:text-subtle focus:outline-none focus:border-subtle transition-colors";
+  const labelClass = "block text-xs text-muted uppercase tracking-wider mb-1.5";
+
   return (
     <div className="max-w-3xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">New Parlay</h1>
+      <h1 className="text-2xl font-semibold mb-6">new parlay</h1>
 
-      {error && <div className="bg-red-50 text-red-700 p-3 rounded mb-4">{error}</div>}
+      {error && <div className="bg-danger/10 text-danger p-3 rounded-xl mb-4 text-sm">{error}</div>}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="bg-white p-6 rounded-lg shadow-md space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="bg-card border border-border p-6 rounded-2xl space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Parlay Name (optional)</label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                placeholder="My big parlay"
-              />
+              <label className={labelClass}>parlay name (optional)</label>
+              <input type="text" value={name} onChange={(e) => setName(e.target.value)} className={inputClass} placeholder="my big parlay" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Total Stake ($)</label>
-              <input
-                type="number"
-                step="0.01"
-                value={stake}
-                onChange={(e) => setStake(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                required
-              />
+              <label className={labelClass}>total stake ($)</label>
+              <input type="number" step="0.01" value={stake} onChange={(e) => setStake(e.target.value)} className={inputClass} required />
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="isSameGame"
-              checked={isSameGame}
-              onChange={(e) => setIsSameGame(e.target.checked)}
-              className="rounded"
-            />
-            <label htmlFor="isSameGame" className="text-sm font-medium text-gray-700">
-              Same Game Parlay (SGP)
-            </label>
+            <input type="checkbox" id="isSameGame" checked={isSameGame} onChange={(e) => setIsSameGame(e.target.checked)} className="rounded border-border bg-background" />
+            <label htmlFor="isSameGame" className="text-sm text-muted">same game parlay (SGP)</label>
           </div>
 
           {combinedOdds && (
-            <div className="text-lg font-bold text-green-600">
-              Combined Odds: {combinedOdds}
+            <div className="text-sm font-medium text-foreground">
+              combined odds: <span className="text-success">{combinedOdds}</span>
             </div>
           )}
         </div>
 
         {legs.map((leg, idx) => (
-          <div key={idx} className="bg-white p-6 rounded-lg shadow-md space-y-3">
+          <div key={idx} className="bg-card border border-border p-5 rounded-2xl space-y-3">
             <div className="flex justify-between items-center">
-              <h3 className="font-bold text-gray-900">Leg {idx + 1}</h3>
+              <h3 className="text-sm font-medium text-foreground">leg {idx + 1}</h3>
               {legs.length > 2 && (
-                <button
-                  type="button"
-                  onClick={() => removeLeg(idx)}
-                  className="text-red-500 text-sm hover:underline"
-                >
-                  Remove
+                <button type="button" onClick={() => removeLeg(idx)} className="text-danger text-xs hover:opacity-70 transition-opacity">
+                  remove
                 </button>
               )}
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Sport</label>
-                <select
-                  value={leg.sport}
-                  onChange={(e) => updateLeg(idx, "sport", e.target.value)}
-                  className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm"
-                >
-                  {SPORTS.map((s) => (
-                    <option key={s} value={s}>{s}</option>
-                  ))}
+                <label className={labelClass}>sport</label>
+                <select value={leg.sport} onChange={(e) => updateLeg(idx, "sport", e.target.value)} className={inputClass}>
+                  {SPORTS.map((s) => <option key={s} value={s}>{s}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Bet Type</label>
-                <select
-                  value={leg.betType}
-                  onChange={(e) => updateLeg(idx, "betType", e.target.value)}
-                  className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm"
-                >
-                  {BET_TYPES.map((bt) => (
-                    <option key={bt.value} value={bt.value}>{bt.label}</option>
-                  ))}
+                <label className={labelClass}>bet type</label>
+                <select value={leg.betType} onChange={(e) => updateLeg(idx, "betType", e.target.value)} className={inputClass}>
+                  {BET_TYPES.map((bt) => <option key={bt.value} value={bt.value}>{bt.label}</option>)}
                 </select>
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Event</label>
-              <input
-                type="text"
-                value={leg.eventName}
-                onChange={(e) => updateLeg(idx, "eventName", e.target.value)}
-                className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm"
-                placeholder="Lakers vs Celtics"
-                required
-              />
+              <label className={labelClass}>event</label>
+              <input type="text" value={leg.eventName} onChange={(e) => updateLeg(idx, "eventName", e.target.value)} className={inputClass} placeholder="Lakers vs Celtics" required />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Event Date</label>
-              <input
-                type="datetime-local"
-                value={leg.eventDate}
-                onChange={(e) => updateLeg(idx, "eventDate", e.target.value)}
-                className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm"
-                required
-              />
+              <label className={labelClass}>event date</label>
+              <input type="datetime-local" value={leg.eventDate} onChange={(e) => updateLeg(idx, "eventDate", e.target.value)} className={inputClass} required />
             </div>
 
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Selection</label>
-                <input
-                  type="text"
-                  value={leg.selection}
-                  onChange={(e) => updateLeg(idx, "selection", e.target.value)}
-                  className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm"
-                  placeholder="Lakers ML"
-                  required
-                />
+                <label className={labelClass}>selection</label>
+                <input type="text" value={leg.selection} onChange={(e) => updateLeg(idx, "selection", e.target.value)} className={inputClass} placeholder="Lakers ML" required />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Odds</label>
-                <input
-                  type="number"
-                  value={leg.odds}
-                  onChange={(e) => updateLeg(idx, "odds", e.target.value)}
-                  className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm"
-                  placeholder="-110"
-                  required
-                />
+                <label className={labelClass}>odds</label>
+                <input type="number" value={leg.odds} onChange={(e) => updateLeg(idx, "odds", e.target.value)} className={inputClass} placeholder="-110" required />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Line</label>
-                <input
-                  type="number"
-                  step="0.5"
-                  value={leg.line}
-                  onChange={(e) => updateLeg(idx, "line", e.target.value)}
-                  className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm"
-                  placeholder="-3.5"
-                />
+                <label className={labelClass}>line</label>
+                <input type="number" step="0.5" value={leg.line} onChange={(e) => updateLeg(idx, "line", e.target.value)} className={inputClass} placeholder="-3.5" />
               </div>
             </div>
           </div>
@@ -253,17 +185,17 @@ export default function NewParlayPage() {
         <button
           type="button"
           onClick={addLeg}
-          className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-lg transition border border-dashed border-gray-300"
+          className="w-full border border-dashed border-border text-muted py-2.5 rounded-2xl text-sm hover:border-subtle hover:text-foreground transition-colors"
         >
-          + Add Leg
+          + add leg
         </button>
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition disabled:opacity-50"
+          className="w-full bg-foreground text-background py-2.5 rounded-full text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
         >
-          {loading ? "Creating Parlay..." : "Log Parlay"}
+          {loading ? "creating parlay..." : "log parlay"}
         </button>
       </form>
     </div>

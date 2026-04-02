@@ -5,6 +5,7 @@ import { useEffect, useState, useCallback, use } from "react";
 import BetCard from "@/components/BetCard";
 import ParlayCard from "@/components/ParlayCard";
 import StatsCard from "@/components/StatsCard";
+import Link from "next/link";
 
 interface UserProfile {
   id: string;
@@ -96,7 +97,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
     fetchData();
   };
 
-  if (!user) return <div className="text-center py-20">Loading...</div>;
+  if (!user) return <div className="text-center py-20 text-muted">loading...</div>;
 
   const wonBets = bets.filter((b) => b.result === "WON").length;
   const lostBets = bets.filter((b) => b.result === "LOST").length;
@@ -105,52 +106,52 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
 
   return (
     <div>
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+      <div className="bg-card border border-border rounded-2xl p-6 mb-6">
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-3xl font-bold">{user.name}</h1>
-            {user.bio && <p className="text-gray-600 mt-1">{user.bio}</p>}
-            <div className="flex gap-6 mt-3 text-sm text-gray-500">
-              <span><strong className="text-gray-900">{user._count.followers}</strong> followers</span>
-              <span><strong className="text-gray-900">{user._count.following}</strong> following</span>
-              <span><strong className="text-gray-900">{user._count.bets}</strong> bets</span>
-              <span><strong className="text-gray-900">{user._count.parlays}</strong> parlays</span>
+            <h1 className="text-2xl font-semibold text-foreground">{user.name}</h1>
+            {user.bio && <p className="text-muted text-sm mt-1">{user.bio}</p>}
+            <div className="flex gap-6 mt-3 text-sm text-muted">
+              <span><strong className="text-foreground">{user._count.followers}</strong> followers</span>
+              <span><strong className="text-foreground">{user._count.following}</strong> following</span>
+              <span><strong className="text-foreground">{user._count.bets}</strong> bets</span>
+              <span><strong className="text-foreground">{user._count.parlays}</strong> parlays</span>
             </div>
           </div>
           {myId && myId !== id && (
             <button
               onClick={toggleFollow}
-              className={`px-6 py-2 rounded-lg font-medium transition ${
+              className={`px-5 py-1.5 rounded-full text-sm font-medium transition-colors ${
                 isFollowing
-                  ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                  : "bg-green-600 text-white hover:bg-green-700"
+                  ? "bg-white/5 text-muted hover:text-foreground border border-border"
+                  : "bg-foreground text-background hover:opacity-90"
               }`}
             >
-              {isFollowing ? "Unfollow" : "Follow"}
+              {isFollowing ? "unfollow" : "follow"}
             </button>
           )}
         </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <StatsCard label="Win Rate" value={`${winRate.toFixed(1)}%`} color={winRate >= 50 ? "text-green-600" : "text-red-600"} />
-        <StatsCard label="Wins" value={wonBets} color="text-green-600" />
-        <StatsCard label="Losses" value={lostBets} color="text-red-600" />
-        <StatsCard label="Total Profit" value={totalProfit} color={totalProfit >= 0 ? "text-green-600" : "text-red-600"} />
+        <StatsCard label="Win Rate" value={`${winRate.toFixed(1)}%`} color={winRate >= 50 ? "text-success" : "text-danger"} />
+        <StatsCard label="Wins" value={wonBets} color="text-success" />
+        <StatsCard label="Losses" value={lostBets} color="text-danger" />
+        <StatsCard label="Total Profit" value={totalProfit} color={totalProfit >= 0 ? "text-success" : "text-danger"} />
       </div>
 
-      <div className="flex gap-4 mb-4 border-b">
+      <div className="flex gap-6 mb-6 border-b border-border">
         <button
           onClick={() => setTab("bets")}
-          className={`pb-2 px-1 font-medium ${tab === "bets" ? "border-b-2 border-green-600 text-green-600" : "text-gray-500"}`}
+          className={`pb-3 text-sm font-medium transition-colors ${tab === "bets" ? "border-b border-foreground text-foreground" : "text-muted hover:text-foreground"}`}
         >
-          Bets ({bets.length})
+          bets ({bets.length})
         </button>
         <button
           onClick={() => setTab("parlays")}
-          className={`pb-2 px-1 font-medium ${tab === "parlays" ? "border-b-2 border-green-600 text-green-600" : "text-gray-500"}`}
+          className={`pb-3 text-sm font-medium transition-colors ${tab === "parlays" ? "border-b border-foreground text-foreground" : "text-muted hover:text-foreground"}`}
         >
-          Parlays ({parlays.length})
+          parlays ({parlays.length})
         </button>
       </div>
 
@@ -159,14 +160,14 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
           {bets.map((bet) => (
             <BetCard key={bet.id} bet={bet} showUser={false} onUpdate={fetchData} />
           ))}
-          {bets.length === 0 && <p className="text-gray-500 col-span-2 text-center py-10">No bets yet.</p>}
+          {bets.length === 0 && <p className="text-muted col-span-2 text-center py-10 text-sm">no bets yet.</p>}
         </div>
       ) : (
         <div className="space-y-4">
           {parlays.map((parlay) => (
             <ParlayCard key={parlay.id} parlay={parlay} showUser={false} />
           ))}
-          {parlays.length === 0 && <p className="text-gray-500 text-center py-10">No parlays yet.</p>}
+          {parlays.length === 0 && <p className="text-muted text-center py-10 text-sm">no parlays yet.</p>}
         </div>
       )}
     </div>

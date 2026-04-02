@@ -61,14 +61,14 @@ export default function UsersPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">Find Bettors</h1>
+      <h1 className="text-2xl font-semibold mb-6">find bettors</h1>
 
       <input
         type="text"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        placeholder="Search by name..."
-        className="w-full border border-gray-300 rounded-lg px-4 py-3 mb-6 focus:ring-2 focus:ring-green-500"
+        placeholder="search by name..."
+        className="w-full bg-card border border-border rounded-xl px-4 py-3 mb-6 text-sm text-foreground placeholder:text-subtle focus:outline-none focus:border-subtle transition-colors"
       />
 
       <div className="space-y-3">
@@ -77,14 +77,14 @@ export default function UsersPage() {
           .map((user) => (
             <div
               key={user.id}
-              className="bg-white rounded-lg shadow-md p-4 flex items-center justify-between"
+              className="bg-card border border-border rounded-2xl p-5 flex items-center justify-between hover:border-subtle transition-colors"
             >
               <div>
-                <Link href={`/profile/${user.id}`} className="font-bold text-lg hover:text-green-600">
+                <Link href={`/profile/${user.id}`} className="font-medium text-foreground hover:opacity-70 transition-opacity">
                   {user.name}
                 </Link>
-                {user.bio && <p className="text-sm text-gray-500">{user.bio}</p>}
-                <div className="flex gap-4 text-sm text-gray-500 mt-1">
+                {user.bio && <p className="text-sm text-muted mt-0.5">{user.bio}</p>}
+                <div className="flex gap-4 text-xs text-muted mt-2">
                   <span>{user._count.bets} bets</span>
                   <span>{user._count.followers} followers</span>
                   <span>{user._count.following} following</span>
@@ -92,13 +92,13 @@ export default function UsersPage() {
               </div>
               <button
                 onClick={() => toggleFollow(user.id)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
                   followingIds.has(user.id)
-                    ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                    : "bg-green-600 text-white hover:bg-green-700"
+                    ? "bg-white/5 text-muted hover:text-foreground border border-border"
+                    : "bg-foreground text-background hover:opacity-90"
                 }`}
               >
-                {followingIds.has(user.id) ? "Unfollow" : "Follow"}
+                {followingIds.has(user.id) ? "unfollow" : "follow"}
               </button>
             </div>
           ))}

@@ -19,21 +19,21 @@ export function calculatePayout(stake: number, odds: number): number {
 
 export function resultColor(result: string): string {
   switch (result) {
-    case "WON": return "text-green-600 bg-green-50";
-    case "LOST": return "text-red-600 bg-red-50";
-    case "PUSH": return "text-yellow-600 bg-yellow-50";
-    case "VOID": return "text-gray-600 bg-gray-50";
-    default: return "text-blue-600 bg-blue-50";
+    case "WON": return "text-success bg-success/10";
+    case "LOST": return "text-danger bg-danger/10";
+    case "PUSH": return "text-warning bg-warning/10";
+    case "VOID": return "text-muted bg-white/5";
+    default: return "text-muted bg-white/5";
   }
 }
 
 export function betTypeLabel(betType: string): string {
   switch (betType) {
-    case "MONEYLINE": return "Moneyline";
-    case "SPREAD": return "Spread";
-    case "OVER_UNDER": return "Over/Under";
-    case "LIVE": return "Live";
-    default: return betType;
+    case "MONEYLINE": return "moneyline";
+    case "SPREAD": return "spread";
+    case "OVER_UNDER": return "over/under";
+    case "LIVE": return "live";
+    default: return betType.toLowerCase();
   }
 }
 

@@ -9,8 +9,20 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        background: "#0a0a0a",
+        foreground: "#fafafa",
+        card: "#141414",
+        "card-hover": "#1a1a1a",
+        border: "#222222",
+        muted: "#737373",
+        accent: "#e5e5e5",
+        subtle: "#404040",
+        success: "#22c55e",
+        danger: "#ef4444",
+        warning: "#f59e0b",
+      },
+      fontFamily: {
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
       },
     },
   },

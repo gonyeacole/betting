@@ -7,7 +7,7 @@ interface StatsCardProps {
   color?: string;
 }
 
-export default function StatsCard({ label, value, subtext, color = "text-gray-900" }: StatsCardProps) {
+export default function StatsCard({ label, value, subtext, color = "text-foreground" }: StatsCardProps) {
   const displayValue = typeof value === "number" && label.toLowerCase().includes("profit")
     ? formatMoney(value)
     : typeof value === "number" && label.toLowerCase().includes("roi")
@@ -15,10 +15,10 @@ export default function StatsCard({ label, value, subtext, color = "text-gray-90
     : value;
 
   return (
-    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-4">
-      <p className="text-sm text-gray-500">{label}</p>
-      <p className={`text-2xl font-bold ${color}`}>{displayValue}</p>
-      {subtext && <p className="text-xs text-gray-400 mt-1">{subtext}</p>}
+    <div className="bg-card border border-border rounded-2xl p-5">
+      <p className="text-xs text-muted uppercase tracking-wider mb-2">{label}</p>
+      <p className={`text-2xl font-semibold ${color}`}>{displayValue}</p>
+      {subtext && <p className="text-xs text-muted mt-1">{subtext}</p>}
     </div>
   );
 }
