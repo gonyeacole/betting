@@ -11,7 +11,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "bettracker",
+  title: "[tracker]",
   description: "track your bets",
 };
 

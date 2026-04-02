@@ -5,7 +5,7 @@ export default function Home() {
     <div className="min-h-[70vh] flex flex-col justify-center">
       <div className="space-y-8">
         <div className="space-y-4">
-          <h1 className="text-sm lowercase">bettracker</h1>
+          <h1 className="text-sm">[tracker]</h1>
           <p className="text-xs text-[#888] leading-relaxed max-w-md">
             track your bets. moneylines, spreads, over/unders, parlays.
             follow other bettors. see how everyone is doing.
