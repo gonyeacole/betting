@@ -2,7 +2,15 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 
+export async function GET() {
+  return seed();
+}
+
 export async function POST() {
+  return seed();
+}
+
+async function seed() {
   try {
     // Check if data already exists
     const existingUsers = await prisma.user.count();
