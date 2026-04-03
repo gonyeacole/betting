@@ -42,11 +42,11 @@ export default function ParlayCard({ parlay, showUser = true }: ParlayCardProps)
     "text-[#555]";
 
   return (
-    <div className="bg-[#1a1a1a] rounded-2xl p-5 mb-3">
+    <div className="bg-[#1a1a1a] rounded-2xl p-5 mb-3 card-hover">
       <div className="flex justify-between items-start mb-3">
         <div>
           {showUser && (
-            <Link href={`/profile/${parlay.user.id}`} className="text-[12px] text-[#555] hover:text-[#888] transition-colors">
+            <Link href={`/profile/${parlay.user.id}`} className="text-[12px] text-[#555] hover:text-[#888]">
               {parlay.user.name}
             </Link>
           )}
@@ -60,9 +60,9 @@ export default function ParlayCard({ parlay, showUser = true }: ParlayCardProps)
         </span>
       </div>
 
-      <div className="space-y-1 mb-4">
+      <div className="space-y-1 mb-4 stagger-children">
         {parlay.legs.map((leg) => (
-          <div key={leg.id} className="flex items-center justify-between bg-[#111] rounded-xl px-3 py-2 text-[13px]">
+          <div key={leg.id} className="flex items-center justify-between bg-[#111] rounded-xl px-3 py-2 text-[13px] card-hover">
             <div className="text-[#888]">
               {leg.eventName}
               <span className="text-[#444] ml-2">{betTypeLabel(leg.betType)}</span>

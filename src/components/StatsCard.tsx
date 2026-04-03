@@ -18,7 +18,7 @@ export default function StatsCard({ label, value, subtext, color }: StatsCardPro
   const isNegative = color?.includes("red");
 
   return (
-    <div className="bg-[#1a1a1a] rounded-2xl p-4">
+    <div className="bg-[#1a1a1a] rounded-2xl p-4 card-hover cursor-default">
       <p className="text-[11px] text-[#555] uppercase tracking-wider mb-1">{label}</p>
       <p className={`text-lg font-semibold ${isPositive ? "text-white" : isNegative ? "text-[#666]" : "text-white"}`}>
         {displayValue}

@@ -150,15 +150,15 @@ export default function DashboardPage() {
   const filteredParlays = parlays.filter((p) => p.legs?.length > 0 && filterByDate(p.legs[0].eventDate));
 
   return (
-    <div>
+    <div className="animate-fade-in-up">
       {/* Profile Header */}
-      <div className="bg-[#1a1a1a] rounded-2xl p-6 mb-6">
+      <div className="bg-[#1a1a1a] rounded-2xl p-6 mb-6 card-hover">
         {editing ? (
-          <div className="space-y-4">
+          <div className="space-y-4 animate-scale-in">
             <div className="flex items-center gap-4">
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="w-16 h-16 rounded-full bg-[#2a2a2a] flex-shrink-0 flex items-center justify-center overflow-hidden border border-[#333] hover:border-[#555] transition-all"
+                className="w-16 h-16 rounded-full bg-[#2a2a2a] flex-shrink-0 flex items-center justify-center overflow-hidden border border-[#333] hover:border-[#555] avatar-glow"
               >
                 {editImage ? (
                   <img src={editImage} alt="" className="w-full h-full object-cover" />
@@ -188,7 +188,7 @@ export default function DashboardPage() {
               rows={2}
             />
             <div className="flex gap-2">
-              <button onClick={saveProfile} className="px-4 py-1.5 text-[12px] text-white bg-[#333] hover:bg-[#444] rounded-full transition-all">
+              <button onClick={saveProfile} className="px-4 py-1.5 text-[12px] text-white bg-[#333] hover:bg-[#444] rounded-full pill-press">
                 Save
               </button>
               <button onClick={() => setEditing(false)} className="px-4 py-1.5 text-[12px] text-[#555] hover:text-[#888] rounded-full transition-all">
@@ -198,7 +198,7 @@ export default function DashboardPage() {
           </div>
         ) : (
           <div className="flex items-start gap-4">
-            <div className="w-16 h-16 rounded-full bg-[#2a2a2a] flex-shrink-0 flex items-center justify-center overflow-hidden">
+            <div className="w-16 h-16 rounded-full bg-[#2a2a2a] flex-shrink-0 flex items-center justify-center overflow-hidden avatar-glow">
               {profile?.image ? (
                 <img src={profile.image} alt="" className="w-full h-full object-cover" />
               ) : (
@@ -211,7 +211,7 @@ export default function DashboardPage() {
                   <h1 className="text-xl font-semibold">{profile?.name || session.user?.name}</h1>
                   {profile?.bio && <p className="text-[13px] text-[#888] mt-1">{profile.bio}</p>}
                 </div>
-                <button onClick={startEditing} className="px-4 py-1.5 text-[12px] text-[#555] bg-[#222] hover:bg-[#2a2a2a] rounded-full transition-all">
+                <button onClick={startEditing} className="px-4 py-1.5 text-[12px] text-[#555] bg-[#222] hover:bg-[#2a2a2a] rounded-full pill-press">
                   Edit
                 </button>
               </div>
@@ -230,7 +230,7 @@ export default function DashboardPage() {
 
         {/* Followers/Following Lists */}
         {showFollowers && (
-          <div className="mt-4 pt-4 border-t border-[#2a2a2a]">
+          <div className="mt-4 pt-4 border-t border-[#2a2a2a] animate-slide-down">
             <p className="text-[12px] text-[#555] uppercase tracking-wider mb-3">Followers</p>
             {followersList.length === 0 ? (
               <p className="text-[13px] text-[#555]">No followers yet</p>
@@ -250,7 +250,7 @@ export default function DashboardPage() {
         )}
 
         {showFollowing && (
-          <div className="mt-4 pt-4 border-t border-[#2a2a2a]">
+          <div className="mt-4 pt-4 border-t border-[#2a2a2a] animate-slide-down">
             <p className="text-[12px] text-[#555] uppercase tracking-wider mb-3">Following</p>
             {followingList.length === 0 ? (
               <p className="text-[13px] text-[#555]">Not following anyone</p>
@@ -270,7 +270,7 @@ export default function DashboardPage() {
         )}
       </div>
 
-      <div className="grid grid-cols-3 md:grid-cols-6 gap-2 mb-8">
+      <div className="grid grid-cols-3 md:grid-cols-6 gap-2 mb-8 stagger-children">
         <StatsCard label="Total" value={totalBets} />
         <StatsCard label="Win Rate" value={`${winRate.toFixed(1)}%`} color={winRate >= 50 ? "text-green-600" : "text-red-600"} />
         <StatsCard label="Wins" value={wonBets} color="text-green-600" />
@@ -285,8 +285,8 @@ export default function DashboardPage() {
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`px-4 py-1.5 text-[13px] rounded-full transition-all capitalize ${
-                tab === t ? "bg-[#1a1a1a] text-white" : "text-[#555] hover:text-[#888]"
+              className={`px-4 py-1.5 text-[13px] rounded-full pill-press capitalize ${
+                tab === t ? "bg-[#1a1a1a] text-white tab-active" : "text-[#555] hover:text-[#888]"
               }`}
             >
               {t}
@@ -294,10 +294,10 @@ export default function DashboardPage() {
           ))}
         </div>
         <div className="flex gap-2">
-          <Link href="/bets/new" className="px-4 py-1.5 text-[13px] text-[#888] bg-[#1a1a1a] hover:bg-[#222] rounded-full transition-all">
+          <Link href="/bets/new" className="px-4 py-1.5 text-[13px] text-[#888] bg-[#1a1a1a] hover:bg-[#222] rounded-full pill-press">
             + Bet
           </Link>
-          <Link href="/parlays/new" className="px-4 py-1.5 text-[13px] text-[#888] bg-[#1a1a1a] hover:bg-[#222] rounded-full transition-all">
+          <Link href="/parlays/new" className="px-4 py-1.5 text-[13px] text-[#888] bg-[#1a1a1a] hover:bg-[#222] rounded-full pill-press">
             + Parlay
           </Link>
         </div>

@@ -35,8 +35,11 @@ export default function BetCard({ bet, showUser = true, onUpdate }: BetCardProps
   const userId = (session?.user as { id?: string })?.id;
   const [liked, setLiked] = useState(bet.likes.some((l) => l.userId === userId));
   const [likeCount, setLikeCount] = useState(bet.likes.length);
+  const [heartAnimating, setHeartAnimating] = useState(false);
 
   const toggleLike = async () => {
+    setHeartAnimating(true);
+    setTimeout(() => setHeartAnimating(false), 400);
     const res = await fetch("/api/likes", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -63,20 +66,20 @@ export default function BetCard({ bet, showUser = true, onUpdate }: BetCardProps
     "bg-[#1a1a1a] text-[#555]";
 
   return (
-    <div className="bg-[#1a1a1a] rounded-2xl p-5 mb-3">
+    <div className="bg-[#1a1a1a] rounded-2xl p-5 mb-3 card-hover">
       <div className="flex justify-between items-start mb-3">
         <div>
           {showUser && (
-            <Link href={`/profile/${bet.user.id}`} className="text-[12px] text-[#555] hover:text-[#888] transition-colors">
+            <Link href={`/profile/${bet.user.id}`} className="text-[12px] text-[#555] hover:text-[#888]">
               {bet.user.name}
             </Link>
           )}
           <h3 className="text-[15px] font-medium text-white">{bet.eventName}</h3>
           <div className="flex gap-2 mt-1.5">
-            <span className="text-[11px] text-[#555] bg-[#222] px-2.5 py-0.5 rounded-full">{bet.sport}</span>
-            <span className="text-[11px] text-[#555] bg-[#222] px-2.5 py-0.5 rounded-full">{betTypeLabel(bet.betType)}</span>
+            <span className="text-[11px] text-[#555] bg-[#222] px-2.5 py-0.5 rounded-full pill-press">{bet.sport}</span>
+            <span className="text-[11px] text-[#555] bg-[#222] px-2.5 py-0.5 rounded-full pill-press">{betTypeLabel(bet.betType)}</span>
             {bet.isLive && (
-              <span className="text-[11px] text-[#f87171] bg-[#2e1a1a] px-2.5 py-0.5 rounded-full">LIVE</span>
+              <span className="text-[11px] text-[#f87171] bg-[#2e1a1a] px-2.5 py-0.5 rounded-full animate-shimmer">LIVE</span>
             )}
           </div>
         </div>
@@ -116,7 +119,10 @@ export default function BetCard({ bet, showUser = true, onUpdate }: BetCardProps
       <div className="flex items-center justify-between pt-3 border-t border-[#222]">
         <div className="flex items-center gap-4 text-[12px] text-[#555]">
           {session && (
-            <button onClick={toggleLike} className={`hover:text-white transition-colors ${liked ? "text-white" : ""}`}>
+            <button
+              onClick={toggleLike}
+              className={`hover:text-white pill-press ${liked ? "text-white" : ""} ${heartAnimating ? "animate-heart-pop" : ""}`}
+            >
               {liked ? "\u2764" : "\u2661"} {likeCount > 0 && likeCount}
             </button>
           )}
@@ -125,9 +131,9 @@ export default function BetCard({ bet, showUser = true, onUpdate }: BetCardProps
 
         {userId === bet.user.id && bet.result === "PENDING" && (
           <div className="flex gap-1.5">
-            <button onClick={() => updateResult("WON")} className="text-[11px] text-[#555] hover:text-[#4ade80] bg-[#222] hover:bg-[#1a2e1a] px-3 py-1 rounded-full transition-all">Won</button>
-            <button onClick={() => updateResult("LOST")} className="text-[11px] text-[#555] hover:text-[#f87171] bg-[#222] hover:bg-[#2e1a1a] px-3 py-1 rounded-full transition-all">Lost</button>
-            <button onClick={() => updateResult("PUSH")} className="text-[11px] text-[#555] hover:text-[#facc15] bg-[#222] hover:bg-[#2e2a1a] px-3 py-1 rounded-full transition-all">Push</button>
+            <button onClick={() => updateResult("WON")} className="text-[11px] text-[#555] hover:text-[#4ade80] bg-[#222] hover:bg-[#1a2e1a] px-3 py-1 rounded-full pill-press">Won</button>
+            <button onClick={() => updateResult("LOST")} className="text-[11px] text-[#555] hover:text-[#f87171] bg-[#222] hover:bg-[#2e1a1a] px-3 py-1 rounded-full pill-press">Lost</button>
+            <button onClick={() => updateResult("PUSH")} className="text-[11px] text-[#555] hover:text-[#facc15] bg-[#222] hover:bg-[#2e2a1a] px-3 py-1 rounded-full pill-press">Push</button>
           </div>
         )}
       </div>
