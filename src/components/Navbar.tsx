@@ -19,11 +19,9 @@ export default function Navbar() {
           <>
             <div className="hidden md:flex items-center gap-1">
               {[
-                { href: "/dashboard", label: "Dashboard" },
-                { href: "/bets/new", label: "New Bet" },
-                { href: "/parlays/new", label: "Parlay" },
+                { href: "/dashboard", label: "Games" },
+                { href: "/users", label: "Sports" },
                 { href: "/feed", label: "Feed" },
-                { href: "/users", label: "People" },
                 { href: `/profile/${(session.user as { id: string }).id}`, label: "Profile" },
               ].map((link) => (
                 <Link
@@ -64,11 +62,10 @@ export default function Navbar() {
       {menuOpen && session && (
         <div className="md:hidden max-w-3xl mx-auto mt-4 flex flex-wrap gap-2">
           {[
-            { href: "/dashboard", label: "Dashboard" },
-            { href: "/bets/new", label: "New Bet" },
-            { href: "/parlays/new", label: "Parlay" },
+            { href: "/dashboard", label: "Games" },
+            { href: "/users", label: "Sports" },
             { href: "/feed", label: "Feed" },
-            { href: "/users", label: "People" },
+            { href: `/profile/${(session.user as { id: string }).id}`, label: "Profile" },
           ].map((link) => (
             <Link
               key={link.href}
