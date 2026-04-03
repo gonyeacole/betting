@@ -18,7 +18,7 @@ export default function RootLayout({
       <body className="antialiased">
         <SessionProvider>
           <Navbar />
-          <main className="max-w-3xl mx-auto px-6 py-10">{children}</main>
+          <main className="max-w-3xl mx-auto px-6 py-10 pb-24 md:pb-10">{children}</main>
         </SessionProvider>
       </body>
     </html>
