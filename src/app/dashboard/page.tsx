@@ -47,7 +47,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const [bets, setBets] = useState<Bet[]>([]);
   const [parlays, setParlays] = useState<Parlay[]>([]);
-  const [tab, setTab] = useState<"bets" | "parlays">("bets");
+  const [tab, setTab] = useState<"today" | "upcoming" | "futures">("today");
 
   const userId = (session?.user as { id?: string })?.id;
 
@@ -77,6 +77,21 @@ export default function DashboardPage() {
   const winRate = wonBets + lostBets > 0 ? (wonBets / (wonBets + lostBets)) * 100 : 0;
   const roi = totalStaked > 0 ? (totalProfit / totalStaked) * 100 : 0;
 
+  const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const todayEnd = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
+  const weekEnd = new Date(todayStart.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+  const filterByDate = (dateStr: string) => {
+    const d = new Date(dateStr);
+    if (tab === "today") return d >= todayStart && d < todayEnd;
+    if (tab === "upcoming") return d >= todayEnd && d < weekEnd;
+    return d >= weekEnd; // futures
+  };
+
+  const filteredBets = bets.filter((b) => filterByDate(b.eventDate));
+  const filteredParlays = parlays.filter((p) => p.legs?.length > 0 && filterByDate(p.legs[0].eventDate));
+
   return (
     <div>
       <div className="flex justify-between items-center mb-8">
@@ -100,56 +115,39 @@ export default function DashboardPage() {
         <StatsCard label="ROI" value={`${roi.toFixed(1)}%`} color={roi >= 0 ? "text-green-600" : "text-red-600"} />
       </div>
 
-      <div className="flex gap-2 mb-6">
-        <button
-          onClick={() => setTab("bets")}
-          className={`px-4 py-1.5 text-[13px] rounded-full transition-all ${
-            tab === "bets" ? "bg-[#1a1a1a] text-white" : "text-[#555] hover:text-[#888]"
-          }`}
-        >
-          Bets ({bets.length})
-        </button>
-        <button
-          onClick={() => setTab("parlays")}
-          className={`px-4 py-1.5 text-[13px] rounded-full transition-all ${
-            tab === "parlays" ? "bg-[#1a1a1a] text-white" : "text-[#555] hover:text-[#888]"
-          }`}
-        >
-          Parlays ({parlays.length})
-        </button>
+      <div className="flex justify-center gap-2 mb-6">
+        {(["today", "upcoming", "futures"] as const).map((t) => (
+          <button
+            key={t}
+            onClick={() => setTab(t)}
+            className={`px-4 py-1.5 text-[13px] rounded-full transition-all capitalize ${
+              tab === t ? "bg-[#1a1a1a] text-white" : "text-[#555] hover:text-[#888]"
+            }`}
+          >
+            {t}
+          </button>
+        ))}
       </div>
 
-      {tab === "bets" ? (
-        <div>
-          {bets.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-[14px] text-[#555] mb-4">No bets yet</p>
-              <Link href="/bets/new" className="text-[13px] text-[#888] hover:text-white transition-colors">
-                Place your first bet
-              </Link>
-            </div>
-          ) : (
-            bets.map((bet) => (
+      <div>
+        {filteredBets.length === 0 && filteredParlays.length === 0 ? (
+          <div className="text-center py-16">
+            <p className="text-[14px] text-[#555] mb-4">No {tab} games</p>
+            <Link href="/bets/new" className="text-[13px] text-[#888] hover:text-white transition-colors">
+              Place a bet
+            </Link>
+          </div>
+        ) : (
+          <>
+            {filteredBets.map((bet) => (
               <BetCard key={bet.id} bet={bet} showUser={false} onUpdate={fetchData} />
-            ))
-          )}
-        </div>
-      ) : (
-        <div>
-          {parlays.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-[14px] text-[#555] mb-4">No parlays yet</p>
-              <Link href="/parlays/new" className="text-[13px] text-[#888] hover:text-white transition-colors">
-                Create your first parlay
-              </Link>
-            </div>
-          ) : (
-            parlays.map((parlay) => (
+            ))}
+            {filteredParlays.map((parlay) => (
               <ParlayCard key={parlay.id} parlay={parlay} showUser={false} />
-            ))
-          )}
-        </div>
-      )}
+            ))}
+          </>
+        )}
+      </div>
     </div>
   );
 }
