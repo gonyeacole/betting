@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useSession } from "next-auth/react";
 import { formatOdds, formatMoney, betTypeLabel } from "@/lib/utils";
 import { useState } from "react";
 
@@ -31,23 +30,15 @@ interface BetCardProps {
 }
 
 export default function BetCard({ bet, showUser = true, onUpdate }: BetCardProps) {
-  const { data: session } = useSession();
-  const userId = (session?.user as { id?: string })?.id;
-  const [liked, setLiked] = useState(bet.likes.some((l) => l.userId === userId));
+  const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(bet.likes.length);
   const [heartAnimating, setHeartAnimating] = useState(false);
 
   const toggleLike = async () => {
     setHeartAnimating(true);
     setTimeout(() => setHeartAnimating(false), 400);
-    const res = await fetch("/api/likes", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ betId: bet.id }),
-    });
-    const data = await res.json();
-    setLiked(data.liked);
-    setLikeCount((c) => (data.liked ? c + 1 : c - 1));
+    setLiked(!liked);
+    setLikeCount((c) => (liked ? c - 1 : c + 1));
   };
 
   const updateResult = async (result: string) => {
@@ -118,18 +109,16 @@ export default function BetCard({ bet, showUser = true, onUpdate }: BetCardProps
 
       <div className="flex items-center justify-between pt-3 border-t border-[#222]">
         <div className="flex items-center gap-4 text-[12px] text-[#555]">
-          {session && (
-            <button
-              onClick={toggleLike}
-              className={`hover:text-white pill-press ${liked ? "text-white" : ""} ${heartAnimating ? "animate-heart-pop" : ""}`}
-            >
-              {liked ? "\u2764" : "\u2661"} {likeCount > 0 && likeCount}
-            </button>
-          )}
+          <button
+            onClick={toggleLike}
+            className={`hover:text-white pill-press ${liked ? "text-white" : ""} ${heartAnimating ? "animate-heart-pop" : ""}`}
+          >
+            {liked ? "\u2764" : "\u2661"} {likeCount > 0 && likeCount}
+          </button>
           <span>{new Date(bet.eventDate).toLocaleDateString()}</span>
         </div>
 
-        {userId === bet.user.id && bet.result === "PENDING" && (
+        {bet.result === "PENDING" && (
           <div className="flex gap-1.5">
             <button onClick={() => updateResult("WON")} className="text-[11px] text-[#555] hover:text-[#4ade80] bg-[#222] hover:bg-[#1a2e1a] px-3 py-1 rounded-full pill-press">Won</button>
             <button onClick={() => updateResult("LOST")} className="text-[11px] text-[#555] hover:text-[#f87171] bg-[#222] hover:bg-[#2e1a1a] px-3 py-1 rounded-full pill-press">Lost</button>

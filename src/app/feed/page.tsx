@@ -1,7 +1,5 @@
 "use client";
 
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import BetCard from "@/components/BetCard";
@@ -51,33 +49,33 @@ type FeedItem =
     });
 
 export default function FeedPage() {
-  const { data: session, status } = useSession();
-  const router = useRouter();
   const [feed, setFeed] = useState<FeedItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchFeed = useCallback(async () => {
-    const res = await fetch("/api/feed");
-    if (res.ok) setFeed(await res.json());
+    try {
+      const res = await fetch("/api/feed");
+      if (res.ok) setFeed(await res.json());
+    } catch {
+      // API error
+    }
     setLoading(false);
   }, []);
 
   useEffect(() => {
-    if (status === "unauthenticated") router.push("/login");
-    if (status === "authenticated") fetchFeed();
-  }, [status, router, fetchFeed]);
+    fetchFeed();
+  }, [fetchFeed]);
 
-  if (status === "loading" || loading) return <div className="text-[14px] text-[#555] py-20 text-center">...</div>;
-  if (!session) return null;
+  if (loading) return <div className="text-[14px] text-[#555] py-20 text-center animate-shimmer">...</div>;
 
   return (
-    <div>
+    <div className="animate-fade-in-up">
       <h1 className="text-xl font-semibold mb-8">Feed</h1>
 
       {feed.length === 0 ? (
         <div className="text-center py-20">
           <p className="text-[14px] text-[#555] mb-4">Your feed is empty</p>
-          <Link href="/users" className="px-5 py-2 text-[13px] text-[#888] bg-[#1a1a1a] hover:bg-[#222] rounded-full transition-all">
+          <Link href="/users" className="px-5 py-2 text-[13px] text-[#888] bg-[#1a1a1a] hover:bg-[#222] rounded-full pill-press">
             Find People
           </Link>
         </div>

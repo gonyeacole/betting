@@ -1,6 +1,5 @@
 "use client";
 
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { SPORTS, BET_TYPES } from "@/lib/utils";
@@ -28,7 +27,6 @@ const emptyLeg = (): Leg => ({
 });
 
 export default function NewParlayPage() {
-  const { data: session, status } = useSession();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -36,13 +34,6 @@ export default function NewParlayPage() {
   const [stake, setStake] = useState("");
   const [isSameGame, setIsSameGame] = useState(false);
   const [legs, setLegs] = useState<Leg[]>([emptyLeg(), emptyLeg()]);
-
-  if (status === "unauthenticated") {
-    router.push("/login");
-    return null;
-  }
-  if (status === "loading") return <div className="text-[14px] text-[#555] py-20 text-center">...</div>;
-  if (!session) return null;
 
   const updateLeg = (idx: number, field: string, value: string) => {
     setLegs((prev) => prev.map((l, i) => (i === idx ? { ...l, [field]: value } : l)));

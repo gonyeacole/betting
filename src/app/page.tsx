@@ -8,20 +8,12 @@ export default function Home() {
         Track your bets. Follow other bettors. See how everyone is doing.
       </p>
 
-      <div className="flex gap-3">
-        <Link
-          href="/register"
-          className="px-6 py-2 text-[13px] font-medium text-white bg-[#1a1a1a] hover:bg-[#222] rounded-full pill-press"
-        >
-          Get Started
-        </Link>
-        <Link
-          href="/login"
-          className="px-6 py-2 text-[13px] font-medium text-[#888] hover:text-white rounded-full pill-press"
-        >
-          Sign In
-        </Link>
-      </div>
+      <Link
+        href="/dashboard"
+        className="px-6 py-2 text-[13px] font-medium text-white bg-[#1a1a1a] hover:bg-[#222] rounded-full pill-press"
+      >
+        Get Started
+      </Link>
 
       <div className="mt-20 flex flex-wrap justify-center gap-3 stagger-children">
         {["Moneyline", "Spread", "Over/Under", "Live", "Parlays", "SGP"].map((tag) => (

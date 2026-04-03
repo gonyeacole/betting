@@ -1,7 +1,5 @@
 "use client";
 
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
@@ -14,53 +12,18 @@ interface UserResult {
 }
 
 export default function UsersPage() {
-  const { data: session, status } = useSession();
-  const router = useRouter();
   const [users, setUsers] = useState<UserResult[]>([]);
   const [search, setSearch] = useState("");
-  const [followingIds, setFollowingIds] = useState<Set<string>>(new Set());
-
-  const userId = (session?.user as { id?: string })?.id;
-
-  useEffect(() => {
-    if (status === "unauthenticated") router.push("/login");
-  }, [status, router]);
 
   useEffect(() => {
     fetch(`/api/users?search=${search}`)
       .then((r) => r.json())
-      .then(setUsers);
+      .then(setUsers)
+      .catch(() => {});
   }, [search]);
 
-  useEffect(() => {
-    if (userId) {
-      fetch(`/api/follows?userId=${userId}`)
-        .then((r) => r.json())
-        .then((data) => {
-          setFollowingIds(new Set(data.following.map((f: { following: { id: string } }) => f.following.id)));
-        });
-    }
-  }, [userId]);
-
-  const toggleFollow = async (targetId: string) => {
-    const res = await fetch("/api/follows", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ followingId: targetId }),
-    });
-    const data = await res.json();
-    setFollowingIds((prev) => {
-      const next = new Set(prev);
-      if (data.following) next.add(targetId);
-      else next.delete(targetId);
-      return next;
-    });
-  };
-
-  if (!session) return null;
-
   return (
-    <div>
+    <div className="animate-fade-in-up">
       <h1 className="text-xl font-semibold mb-6">People</h1>
 
       <div className="relative mb-8">
@@ -76,33 +39,30 @@ export default function UsersPage() {
         />
       </div>
 
-      <div className="space-y-2">
-        {users
-          .filter((u) => u.id !== userId)
-          .map((user) => (
-            <div key={user.id} className="flex items-center justify-between bg-[#1a1a1a] rounded-2xl p-4">
-              <div>
-                <Link href={`/profile/${user.id}`} className="text-[14px] font-medium text-white hover:text-[#ccc] transition-colors">
-                  {user.name}
-                </Link>
-                {user.bio && <p className="text-[12px] text-[#555] mt-0.5">{user.bio}</p>}
-                <div className="flex gap-4 text-[11px] text-[#444] mt-1">
-                  <span>{user._count.bets} bets</span>
-                  <span>{user._count.followers} followers</span>
-                </div>
+      <div className="space-y-2 stagger-children">
+        {users.map((user) => (
+          <div key={user.id} className="flex items-center justify-between bg-[#1a1a1a] rounded-2xl p-4 card-hover">
+            <div>
+              <Link href={`/profile/${user.id}`} className="text-[14px] font-medium text-white hover:text-[#ccc]">
+                {user.name}
+              </Link>
+              {user.bio && <p className="text-[12px] text-[#555] mt-0.5">{user.bio}</p>}
+              <div className="flex gap-4 text-[11px] text-[#444] mt-1">
+                <span>{user._count.bets} bets</span>
+                <span>{user._count.followers} followers</span>
               </div>
-              <button
-                onClick={() => toggleFollow(user.id)}
-                className={`px-4 py-1.5 text-[12px] rounded-full transition-all ${
-                  followingIds.has(user.id)
-                    ? "text-[#555] bg-[#222] hover:bg-[#2a2a2a]"
-                    : "text-white bg-[#333] hover:bg-[#444]"
-                }`}
-              >
-                {followingIds.has(user.id) ? "Following" : "Follow"}
-              </button>
             </div>
-          ))}
+            <Link
+              href={`/profile/${user.id}`}
+              className="px-4 py-1.5 text-[12px] text-white bg-[#333] hover:bg-[#444] rounded-full pill-press"
+            >
+              View
+            </Link>
+          </div>
+        ))}
+        {users.length === 0 && (
+          <p className="text-[14px] text-[#555] text-center py-16">No users found</p>
+        )}
       </div>
     </div>
   );

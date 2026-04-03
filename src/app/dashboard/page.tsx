@@ -1,7 +1,5 @@
 "use client";
 
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import BetCard from "@/components/BetCard";
@@ -56,9 +54,9 @@ interface Parlay {
   legs: Bet[];
 }
 
+const DEFAULT_USER_ID = "default";
+
 export default function DashboardPage() {
-  const { data: session, status } = useSession();
-  const router = useRouter();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [bets, setBets] = useState<Bet[]>([]);
   const [parlays, setParlays] = useState<Parlay[]>([]);
@@ -71,30 +69,48 @@ export default function DashboardPage() {
   const [showFollowing, setShowFollowing] = useState(false);
   const [followersList, setFollowersList] = useState<FollowUser[]>([]);
   const [followingList, setFollowingList] = useState<FollowUser[]>([]);
+  const [userId, setUserId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const userId = (session?.user as { id?: string })?.id;
+  // Get or create a default user
+  useEffect(() => {
+    const fetchDefaultUser = async () => {
+      try {
+        const res = await fetch("/api/users");
+        const users = await res.json();
+        if (users.length > 0) {
+          setUserId(users[0].id);
+        }
+      } catch {
+        // No users yet
+      }
+    };
+    fetchDefaultUser();
+  }, []);
 
   const fetchData = useCallback(async () => {
     if (!userId) return;
-    const [profileRes, betsRes, parlaysRes, followsRes] = await Promise.all([
-      fetch(`/api/users/${userId}`),
-      fetch(`/api/bets?userId=${userId}`),
-      fetch(`/api/parlays?userId=${userId}`),
-      fetch(`/api/follows?userId=${userId}`),
-    ]);
-    setProfile(await profileRes.json());
-    setBets(await betsRes.json());
-    setParlays(await parlaysRes.json());
-    const followsData = await followsRes.json();
-    setFollowersList(followsData.followers?.map((f: { follower: FollowUser }) => f.follower) || []);
-    setFollowingList(followsData.following?.map((f: { following: FollowUser }) => f.following) || []);
+    try {
+      const [profileRes, betsRes, parlaysRes, followsRes] = await Promise.all([
+        fetch(`/api/users/${userId}`),
+        fetch(`/api/bets?userId=${userId}`),
+        fetch(`/api/parlays?userId=${userId}`),
+        fetch(`/api/follows?userId=${userId}`),
+      ]);
+      setProfile(await profileRes.json());
+      setBets(await betsRes.json());
+      setParlays(await parlaysRes.json());
+      const followsData = await followsRes.json();
+      setFollowersList(followsData.followers?.map((f: { follower: FollowUser }) => f.follower) || []);
+      setFollowingList(followsData.following?.map((f: { following: FollowUser }) => f.following) || []);
+    } catch {
+      // API errors
+    }
   }, [userId]);
 
   useEffect(() => {
-    if (status === "unauthenticated") router.push("/login");
     if (userId) fetchData();
-  }, [status, userId, router, fetchData]);
+  }, [userId, fetchData]);
 
   const startEditing = () => {
     setEditName(profile?.name || "");
@@ -122,9 +138,6 @@ export default function DashboardPage() {
     };
     reader.readAsDataURL(file);
   };
-
-  if (status === "loading") return <div className="text-[14px] text-[#555] py-20 text-center">...</div>;
-  if (!session) return null;
 
   const totalBets = bets.length + parlays.length;
   const wonBets = bets.filter((b) => b.result === "WON").length;
@@ -191,7 +204,7 @@ export default function DashboardPage() {
               <button onClick={saveProfile} className="px-4 py-1.5 text-[12px] text-white bg-[#333] hover:bg-[#444] rounded-full pill-press">
                 Save
               </button>
-              <button onClick={() => setEditing(false)} className="px-4 py-1.5 text-[12px] text-[#555] hover:text-[#888] rounded-full transition-all">
+              <button onClick={() => setEditing(false)} className="px-4 py-1.5 text-[12px] text-[#555] hover:text-[#888] rounded-full pill-press">
                 Cancel
               </button>
             </div>
@@ -202,18 +215,20 @@ export default function DashboardPage() {
               {profile?.image ? (
                 <img src={profile.image} alt="" className="w-full h-full object-cover" />
               ) : (
-                <span className="text-[#555] text-lg font-semibold">{profile?.name?.[0]?.toUpperCase()}</span>
+                <span className="text-[#555] text-lg font-semibold">{profile?.name?.[0]?.toUpperCase() || "?"}</span>
               )}
             </div>
             <div className="flex-1">
               <div className="flex justify-between items-start">
                 <div>
-                  <h1 className="text-xl font-semibold">{profile?.name || session.user?.name}</h1>
+                  <h1 className="text-xl font-semibold">{profile?.name || "Your Profile"}</h1>
                   {profile?.bio && <p className="text-[13px] text-[#888] mt-1">{profile.bio}</p>}
                 </div>
-                <button onClick={startEditing} className="px-4 py-1.5 text-[12px] text-[#555] bg-[#222] hover:bg-[#2a2a2a] rounded-full pill-press">
-                  Edit
-                </button>
+                {profile && (
+                  <button onClick={startEditing} className="px-4 py-1.5 text-[12px] text-[#555] bg-[#222] hover:bg-[#2a2a2a] rounded-full pill-press">
+                    Edit
+                  </button>
+                )}
               </div>
               <div className="flex gap-5 mt-3 text-[12px] text-[#555]">
                 <button onClick={() => { setShowFollowers(!showFollowers); setShowFollowing(false); }} className="hover:text-[#888] transition-colors">

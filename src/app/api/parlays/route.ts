@@ -1,6 +1,4 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { calculatePayout } from "@/lib/utils";
 
@@ -25,16 +23,18 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   try {
     const body = await req.json();
-    const userId = (session.user as { id: string }).id;
 
-    // Calculate combined odds (multiply decimal odds)
+    let userId = body.userId;
+    if (!userId) {
+      const firstUser = await prisma.user.findFirst({ orderBy: { createdAt: "asc" } });
+      if (!firstUser) {
+        return NextResponse.json({ error: "No users exist. Visit /api/seed first." }, { status: 400 });
+      }
+      userId = firstUser.id;
+    }
+
     let decimalOdds = 1;
     for (const leg of body.legs) {
       const odds = leg.odds;
@@ -44,7 +44,6 @@ export async function POST(req: Request) {
         decimalOdds *= (100 / Math.abs(odds)) + 1;
       }
     }
-    // Convert back to American
     let totalOdds: number;
     if (decimalOdds >= 2) {
       totalOdds = Math.round((decimalOdds - 1) * 100);

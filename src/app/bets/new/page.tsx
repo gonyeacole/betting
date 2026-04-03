@@ -1,12 +1,10 @@
 "use client";
 
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { SPORTS, BET_TYPES } from "@/lib/utils";
 
 export default function NewBetPage() {
-  const { data: session, status } = useSession();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -24,13 +22,6 @@ export default function NewBetPage() {
     isLive: false,
     notes: "",
   });
-
-  if (status === "unauthenticated") {
-    router.push("/login");
-    return null;
-  }
-  if (status === "loading") return <div className="text-[14px] text-[#555] py-20 text-center">...</div>;
-  if (!session) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
