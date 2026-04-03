@@ -1,16 +1,14 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-export async function POST(req: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+export const dynamic = "force-dynamic";
 
-  const { followingId } = await req.json();
-  const followerId = (session.user as { id: string }).id;
+export async function POST(req: Request) {
+  const { followerId, followingId } = await req.json();
+
+  if (!followerId || !followingId) {
+    return NextResponse.json({ error: "followerId and followingId required" }, { status: 400 });
+  }
 
   if (followerId === followingId) {
     return NextResponse.json({ error: "Cannot follow yourself" }, { status: 400 });

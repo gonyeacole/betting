@@ -54,8 +54,6 @@ interface Parlay {
   legs: Bet[];
 }
 
-const DEFAULT_USER_ID = "default";
-
 export default function DashboardPage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [bets, setBets] = useState<Bet[]>([]);
