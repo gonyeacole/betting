@@ -2,11 +2,25 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import BetCard from "@/components/BetCard";
 import ParlayCard from "@/components/ParlayCard";
 import StatsCard from "@/components/StatsCard";
+
+interface UserProfile {
+  id: string;
+  name: string;
+  image?: string | null;
+  bio?: string | null;
+  _count: { bets: number; followers: number; following: number; parlays: number };
+}
+
+interface FollowUser {
+  id: string;
+  name: string;
+  image?: string | null;
+}
 
 interface Bet {
   id: string;
@@ -45,26 +59,69 @@ interface Parlay {
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [bets, setBets] = useState<Bet[]>([]);
   const [parlays, setParlays] = useState<Parlay[]>([]);
   const [tab, setTab] = useState<"today" | "upcoming" | "futures">("today");
+  const [editing, setEditing] = useState(false);
+  const [editName, setEditName] = useState("");
+  const [editBio, setEditBio] = useState("");
+  const [editImage, setEditImage] = useState("");
+  const [showFollowers, setShowFollowers] = useState(false);
+  const [showFollowing, setShowFollowing] = useState(false);
+  const [followersList, setFollowersList] = useState<FollowUser[]>([]);
+  const [followingList, setFollowingList] = useState<FollowUser[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const userId = (session?.user as { id?: string })?.id;
 
   const fetchData = useCallback(async () => {
     if (!userId) return;
-    const [betsRes, parlaysRes] = await Promise.all([
+    const [profileRes, betsRes, parlaysRes, followsRes] = await Promise.all([
+      fetch(`/api/users/${userId}`),
       fetch(`/api/bets?userId=${userId}`),
       fetch(`/api/parlays?userId=${userId}`),
+      fetch(`/api/follows?userId=${userId}`),
     ]);
+    setProfile(await profileRes.json());
     setBets(await betsRes.json());
     setParlays(await parlaysRes.json());
+    const followsData = await followsRes.json();
+    setFollowersList(followsData.followers?.map((f: { follower: FollowUser }) => f.follower) || []);
+    setFollowingList(followsData.following?.map((f: { following: FollowUser }) => f.following) || []);
   }, [userId]);
 
   useEffect(() => {
     if (status === "unauthenticated") router.push("/login");
     if (userId) fetchData();
   }, [status, userId, router, fetchData]);
+
+  const startEditing = () => {
+    setEditName(profile?.name || "");
+    setEditBio(profile?.bio || "");
+    setEditImage(profile?.image || "");
+    setEditing(true);
+  };
+
+  const saveProfile = async () => {
+    await fetch(`/api/users/${userId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: editName, bio: editBio, image: editImage }),
+    });
+    setEditing(false);
+    fetchData();
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setEditImage(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
 
   if (status === "loading") return <div className="text-[14px] text-[#555] py-20 text-center">...</div>;
   if (!session) return null;
@@ -86,7 +143,7 @@ export default function DashboardPage() {
     const d = new Date(dateStr);
     if (tab === "today") return d >= todayStart && d < todayEnd;
     if (tab === "upcoming") return d >= todayEnd && d < weekEnd;
-    return d >= weekEnd; // futures
+    return d >= weekEnd;
   };
 
   const filteredBets = bets.filter((b) => filterByDate(b.eventDate));
@@ -94,16 +151,123 @@ export default function DashboardPage() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-xl font-semibold">Dashboard</h1>
-        <div className="flex gap-2">
-          <Link href="/bets/new" className="px-4 py-1.5 text-[13px] text-[#888] bg-[#1a1a1a] hover:bg-[#222] rounded-full transition-all">
-            + Bet
-          </Link>
-          <Link href="/parlays/new" className="px-4 py-1.5 text-[13px] text-[#888] bg-[#1a1a1a] hover:bg-[#222] rounded-full transition-all">
-            + Parlay
-          </Link>
-        </div>
+      {/* Profile Header */}
+      <div className="bg-[#1a1a1a] rounded-2xl p-6 mb-6">
+        {editing ? (
+          <div className="space-y-4">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="w-16 h-16 rounded-full bg-[#2a2a2a] flex-shrink-0 flex items-center justify-center overflow-hidden border border-[#333] hover:border-[#555] transition-all"
+              >
+                {editImage ? (
+                  <img src={editImage} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-[#555] text-[11px]">+ Photo</span>
+                )}
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+              <input
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                className="flex-1 bg-[#111] rounded-xl px-4 py-2.5 text-[14px] border border-[#2a2a2a]"
+                placeholder="Name"
+              />
+            </div>
+            <textarea
+              value={editBio}
+              onChange={(e) => setEditBio(e.target.value)}
+              className="w-full bg-[#111] rounded-xl px-4 py-2.5 text-[14px] border border-[#2a2a2a] resize-none"
+              placeholder="Bio"
+              rows={2}
+            />
+            <div className="flex gap-2">
+              <button onClick={saveProfile} className="px-4 py-1.5 text-[12px] text-white bg-[#333] hover:bg-[#444] rounded-full transition-all">
+                Save
+              </button>
+              <button onClick={() => setEditing(false)} className="px-4 py-1.5 text-[12px] text-[#555] hover:text-[#888] rounded-full transition-all">
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-start gap-4">
+            <div className="w-16 h-16 rounded-full bg-[#2a2a2a] flex-shrink-0 flex items-center justify-center overflow-hidden">
+              {profile?.image ? (
+                <img src={profile.image} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-[#555] text-lg font-semibold">{profile?.name?.[0]?.toUpperCase()}</span>
+              )}
+            </div>
+            <div className="flex-1">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h1 className="text-xl font-semibold">{profile?.name || session.user?.name}</h1>
+                  {profile?.bio && <p className="text-[13px] text-[#888] mt-1">{profile.bio}</p>}
+                </div>
+                <button onClick={startEditing} className="px-4 py-1.5 text-[12px] text-[#555] bg-[#222] hover:bg-[#2a2a2a] rounded-full transition-all">
+                  Edit
+                </button>
+              </div>
+              <div className="flex gap-5 mt-3 text-[12px] text-[#555]">
+                <button onClick={() => { setShowFollowers(!showFollowers); setShowFollowing(false); }} className="hover:text-[#888] transition-colors">
+                  <span className="text-white font-medium">{profile?._count.followers || 0}</span> followers
+                </button>
+                <button onClick={() => { setShowFollowing(!showFollowing); setShowFollowers(false); }} className="hover:text-[#888] transition-colors">
+                  <span className="text-white font-medium">{profile?._count.following || 0}</span> following
+                </button>
+                <span><span className="text-white font-medium">{profile?._count.bets || 0}</span> bets</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Followers/Following Lists */}
+        {showFollowers && (
+          <div className="mt-4 pt-4 border-t border-[#2a2a2a]">
+            <p className="text-[12px] text-[#555] uppercase tracking-wider mb-3">Followers</p>
+            {followersList.length === 0 ? (
+              <p className="text-[13px] text-[#555]">No followers yet</p>
+            ) : (
+              <div className="space-y-2">
+                {followersList.map((u) => (
+                  <Link key={u.id} href={`/profile/${u.id}`} className="flex items-center gap-3 py-1.5 hover:bg-[#222] rounded-xl px-2 -mx-2 transition-all">
+                    <div className="w-8 h-8 rounded-full bg-[#2a2a2a] flex items-center justify-center overflow-hidden">
+                      {u.image ? <img src={u.image} alt="" className="w-full h-full object-cover" /> : <span className="text-[#555] text-xs">{u.name[0]}</span>}
+                    </div>
+                    <span className="text-[13px]">{u.name}</span>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {showFollowing && (
+          <div className="mt-4 pt-4 border-t border-[#2a2a2a]">
+            <p className="text-[12px] text-[#555] uppercase tracking-wider mb-3">Following</p>
+            {followingList.length === 0 ? (
+              <p className="text-[13px] text-[#555]">Not following anyone</p>
+            ) : (
+              <div className="space-y-2">
+                {followingList.map((u) => (
+                  <Link key={u.id} href={`/profile/${u.id}`} className="flex items-center gap-3 py-1.5 hover:bg-[#222] rounded-xl px-2 -mx-2 transition-all">
+                    <div className="w-8 h-8 rounded-full bg-[#2a2a2a] flex items-center justify-center overflow-hidden">
+                      {u.image ? <img src={u.image} alt="" className="w-full h-full object-cover" /> : <span className="text-[#555] text-xs">{u.name[0]}</span>}
+                    </div>
+                    <span className="text-[13px]">{u.name}</span>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-3 md:grid-cols-6 gap-2 mb-8">
@@ -115,18 +279,28 @@ export default function DashboardPage() {
         <StatsCard label="ROI" value={`${roi.toFixed(1)}%`} color={roi >= 0 ? "text-green-600" : "text-red-600"} />
       </div>
 
-      <div className="flex justify-center gap-2 mb-6">
-        {(["today", "upcoming", "futures"] as const).map((t) => (
-          <button
-            key={t}
-            onClick={() => setTab(t)}
-            className={`px-4 py-1.5 text-[13px] rounded-full transition-all capitalize ${
-              tab === t ? "bg-[#1a1a1a] text-white" : "text-[#555] hover:text-[#888]"
-            }`}
-          >
-            {t}
-          </button>
-        ))}
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-center gap-2 flex-1">
+          {(["today", "upcoming", "futures"] as const).map((t) => (
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              className={`px-4 py-1.5 text-[13px] rounded-full transition-all capitalize ${
+                tab === t ? "bg-[#1a1a1a] text-white" : "text-[#555] hover:text-[#888]"
+              }`}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+        <div className="flex gap-2">
+          <Link href="/bets/new" className="px-4 py-1.5 text-[13px] text-[#888] bg-[#1a1a1a] hover:bg-[#222] rounded-full transition-all">
+            + Bet
+          </Link>
+          <Link href="/parlays/new" className="px-4 py-1.5 text-[13px] text-[#888] bg-[#1a1a1a] hover:bg-[#222] rounded-full transition-all">
+            + Parlay
+          </Link>
+        </div>
       </div>
 
       <div>
