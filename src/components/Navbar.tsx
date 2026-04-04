@@ -8,7 +8,7 @@ export default function Navbar() {
 
   const navLinks = [
     { href: "/dashboard", label: "Games" },
-    { href: "/users", label: "Sports" },
+    { href: "/scores", label: "Scores" },
     { href: "/feed", label: "Feed" },
     { href: "/profile", label: "Profile" },
   ];
