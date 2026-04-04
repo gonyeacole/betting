@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
+import { useRouter } from "next/navigation";
 
 interface Game {
   id: string;
@@ -147,8 +148,33 @@ function OddsCell({ top, bottom, green }: { top: string; bottom: string; green?:
 }
 
 function GameCard({ game }: { game: Game }) {
+  const router = useRouter();
+  const [navigating, setNavigating] = useState(false);
+
+  const handleClick = async () => {
+    if (navigating) return;
+    setNavigating(true);
+    try {
+      const res = await fetch(
+        `/api/espn-lookup?sportKey=${encodeURIComponent(game.sportKey)}&home=${encodeURIComponent(game.homeTeam)}&away=${encodeURIComponent(game.awayTeam)}&date=${encodeURIComponent(game.startTime)}`
+      );
+      const data = await res.json();
+      if (data.eventId && data.sport) {
+        router.push(`/scores/${data.eventId}?sport=${data.sport}`);
+      } else {
+        // Fallback: go to scores page filtered by sport
+        setNavigating(false);
+      }
+    } catch {
+      setNavigating(false);
+    }
+  };
+
   return (
-    <div className="bg-[#1a1a1a] rounded-2xl overflow-hidden card-hover">
+    <div
+      onClick={handleClick}
+      className={`bg-[#1a1a1a] rounded-2xl overflow-hidden card-hover cursor-pointer transition-opacity ${navigating ? "opacity-60" : ""}`}
+    >
       {/* Header */}
       <div className="flex items-center justify-between px-3 md:px-4 pt-3 pb-1">
         <div className="text-[10px] md:text-[11px] text-[#444]">
