@@ -1,339 +1,278 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
-import Link from "next/link";
-import BetCard from "@/components/BetCard";
-import ParlayCard from "@/components/ParlayCard";
-import StatsCard from "@/components/StatsCard";
+import { useEffect, useState, useCallback } from "react";
 
-interface UserProfile {
-  id: string;
-  name: string;
-  image?: string | null;
-  bio?: string | null;
-  _count: { bets: number; followers: number; following: number; parlays: number };
-}
-
-interface FollowUser {
-  id: string;
-  name: string;
-  image?: string | null;
-}
-
-interface Bet {
+interface Game {
   id: string;
   sport: string;
-  league?: string | null;
-  eventName: string;
-  eventDate: string;
-  betType: string;
-  selection: string;
-  odds: number;
-  stake: number;
-  potentialPayout: number;
-  line?: number | null;
+  sportKey: string;
+  homeTeam: string;
+  awayTeam: string;
+  startTime: string;
   isLive: boolean;
-  result: string;
-  profit?: number | null;
-  notes?: string | null;
-  createdAt: string;
-  user: { id: string; name: string; image?: string | null };
-  likes: { id: string; userId: string }[];
+  completed: boolean;
+  homeScore: string | null;
+  awayScore: string | null;
+  moneyline: { home: number | null; away: number | null; draw: number | null };
+  spread: { home: number | null; homePoint: number | null; away: number | null; awayPoint: number | null };
+  total: { over: number | null; under: number | null; point: number | null };
 }
 
-interface Parlay {
-  id: string;
-  name?: string | null;
-  totalOdds: number;
-  stake: number;
-  potentialPayout: number;
-  isSameGame: boolean;
-  result: string;
-  createdAt: string;
-  user: { id: string; name: string; image?: string | null };
-  legs: Bet[];
+const SPORTS_FILTER = ["All", "NFL", "NBA", "MLB", "NHL", "NCAA Football", "NCAA Basketball", "EPL", "La Liga", "MLS", "MMA/UFC"];
+
+function formatOdds(odds: number | null): string {
+  if (odds === null) return "—";
+  return odds > 0 ? `+${odds}` : `${odds}`;
 }
 
-export default function DashboardPage() {
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [bets, setBets] = useState<Bet[]>([]);
-  const [parlays, setParlays] = useState<Parlay[]>([]);
-  const [tab, setTab] = useState<"today" | "upcoming" | "futures">("today");
-  const [editing, setEditing] = useState(false);
-  const [editName, setEditName] = useState("");
-  const [editBio, setEditBio] = useState("");
-  const [editImage, setEditImage] = useState("");
-  const [showFollowers, setShowFollowers] = useState(false);
-  const [showFollowing, setShowFollowing] = useState(false);
-  const [followersList, setFollowersList] = useState<FollowUser[]>([]);
-  const [followingList, setFollowingList] = useState<FollowUser[]>([]);
-  const [userId, setUserId] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+function formatTime(dateStr: string): string {
+  const d = new Date(dateStr);
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const tomorrow = new Date(today.getTime() + 86400000);
+  const gameDay = new Date(d.getFullYear(), d.getMonth(), d.getDate());
 
-  // Get or create a default user
-  useEffect(() => {
-    const fetchDefaultUser = async () => {
-      try {
-        const res = await fetch("/api/users");
-        const users = await res.json();
-        if (users.length > 0) {
-          setUserId(users[0].id);
-        }
-      } catch {
-        // No users yet
+  let dayLabel = "";
+  if (gameDay.getTime() === today.getTime()) dayLabel = "Today";
+  else if (gameDay.getTime() === tomorrow.getTime()) dayLabel = "Tomorrow";
+  else dayLabel = d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+
+  const time = d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+  return `${dayLabel} · ${time}`;
+}
+
+export default function GamesPage() {
+  const [games, setGames] = useState<Game[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [activeSport, setActiveSport] = useState("All");
+  const [lineType, setLineType] = useState<"moneyline" | "spread" | "total">("moneyline");
+
+  const fetchGames = useCallback(async () => {
+    try {
+      const res = await fetch("/api/odds");
+      const data = await res.json();
+      if (data.error && !data.games?.length) {
+        setError(data.message || data.error);
       }
-    };
-    fetchDefaultUser();
+      setGames(data.games || []);
+    } catch {
+      setError("Failed to load games");
+    }
+    setLoading(false);
   }, []);
 
-  const fetchData = useCallback(async () => {
-    if (!userId) return;
-    try {
-      const [profileRes, betsRes, parlaysRes, followsRes] = await Promise.all([
-        fetch(`/api/users/${userId}`),
-        fetch(`/api/bets?userId=${userId}`),
-        fetch(`/api/parlays?userId=${userId}`),
-        fetch(`/api/follows?userId=${userId}`),
-      ]);
-      setProfile(await profileRes.json());
-      setBets(await betsRes.json());
-      setParlays(await parlaysRes.json());
-      const followsData = await followsRes.json();
-      setFollowersList(followsData.followers?.map((f: { follower: FollowUser }) => f.follower) || []);
-      setFollowingList(followsData.following?.map((f: { following: FollowUser }) => f.following) || []);
-    } catch {
-      // API errors
-    }
-  }, [userId]);
-
   useEffect(() => {
-    if (userId) fetchData();
-  }, [userId, fetchData]);
+    fetchGames();
+    // Refresh every 5 minutes
+    const interval = setInterval(fetchGames, 300000);
+    return () => clearInterval(interval);
+  }, [fetchGames]);
 
-  const startEditing = () => {
-    setEditName(profile?.name || "");
-    setEditBio(profile?.bio || "");
-    setEditImage(profile?.image || "");
-    setEditing(true);
-  };
+  const filteredGames = activeSport === "All"
+    ? games
+    : games.filter(g => g.sport === activeSport);
 
-  const saveProfile = async () => {
-    await fetch(`/api/users/${userId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: editName, bio: editBio, image: editImage }),
-    });
-    setEditing(false);
-    fetchData();
-  };
+  // Group by sport
+  const groupedBySport: Record<string, Game[]> = {};
+  for (const game of filteredGames) {
+    if (!groupedBySport[game.sport]) groupedBySport[game.sport] = [];
+    groupedBySport[game.sport].push(game);
+  }
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setEditImage(reader.result as string);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const totalBets = bets.length + parlays.length;
-  const wonBets = bets.filter((b) => b.result === "WON").length;
-  const lostBets = bets.filter((b) => b.result === "LOST").length;
-  const totalStaked = bets.reduce((s, b) => s + b.stake, 0) + parlays.reduce((s, p) => s + p.stake, 0);
-  const totalProfit = bets.reduce((s, b) => s + (b.profit || 0), 0);
-  const winRate = wonBets + lostBets > 0 ? (wonBets / (wonBets + lostBets)) * 100 : 0;
-  const roi = totalStaked > 0 ? (totalProfit / totalStaked) * 100 : 0;
-
-  const now = new Date();
-  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const todayEnd = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
-  const weekEnd = new Date(todayStart.getTime() + 7 * 24 * 60 * 60 * 1000);
-
-  const filterByDate = (dateStr: string) => {
-    const d = new Date(dateStr);
-    if (tab === "today") return d >= todayStart && d < todayEnd;
-    if (tab === "upcoming") return d >= todayEnd && d < weekEnd;
-    return d >= weekEnd;
-  };
-
-  const filteredBets = bets.filter((b) => filterByDate(b.eventDate));
-  const filteredParlays = parlays.filter((p) => p.legs?.length > 0 && filterByDate(p.legs[0].eventDate));
+  if (loading) {
+    return (
+      <div className="animate-fade-in-up">
+        <div className="text-center py-20">
+          <div className="text-[14px] text-[#555] animate-shimmer">Loading games...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="animate-fade-in-up">
-      {/* Profile Header */}
-      <div className="bg-[#1a1a1a] rounded-2xl p-6 mb-6 card-hover">
-        {editing ? (
-          <div className="space-y-4 animate-scale-in">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="w-16 h-16 rounded-full bg-[#2a2a2a] flex-shrink-0 flex items-center justify-center overflow-hidden border border-[#333] hover:border-[#555] avatar-glow"
-              >
-                {editImage ? (
-                  <img src={editImage} alt="" className="w-full h-full object-cover" />
-                ) : (
-                  <span className="text-[#555] text-[11px]">+ Photo</span>
-                )}
-              </button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="hidden"
-              />
-              <input
-                value={editName}
-                onChange={(e) => setEditName(e.target.value)}
-                className="flex-1 bg-[#111] rounded-xl px-4 py-2.5 text-[14px] border border-[#2a2a2a]"
-                placeholder="Name"
-              />
-            </div>
-            <textarea
-              value={editBio}
-              onChange={(e) => setEditBio(e.target.value)}
-              className="w-full bg-[#111] rounded-xl px-4 py-2.5 text-[14px] border border-[#2a2a2a] resize-none"
-              placeholder="Bio"
-              rows={2}
-            />
-            <div className="flex gap-2">
-              <button onClick={saveProfile} className="px-4 py-1.5 text-[12px] text-white bg-[#333] hover:bg-[#444] rounded-full pill-press">
-                Save
-              </button>
-              <button onClick={() => setEditing(false)} className="px-4 py-1.5 text-[12px] text-[#555] hover:text-[#888] rounded-full pill-press">
-                Cancel
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="flex items-start gap-4">
-            <div className="w-16 h-16 rounded-full bg-[#2a2a2a] flex-shrink-0 flex items-center justify-center overflow-hidden avatar-glow">
-              {profile?.image ? (
-                <img src={profile.image} alt="" className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-[#555] text-lg font-semibold">{profile?.name?.[0]?.toUpperCase() || "?"}</span>
-              )}
-            </div>
-            <div className="flex-1">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h1 className="text-xl font-semibold">{profile?.name || "Your Profile"}</h1>
-                  {profile?.bio && <p className="text-[13px] text-[#888] mt-1">{profile.bio}</p>}
+      <h1 className="text-xl font-semibold mb-6">Games</h1>
+
+      {/* Sport Filter */}
+      <div className="flex gap-2 mb-4 overflow-x-auto pb-2 -mx-6 px-6 scrollbar-hide">
+        {SPORTS_FILTER.map((sport) => (
+          <button
+            key={sport}
+            onClick={() => setActiveSport(sport)}
+            className={`px-4 py-1.5 text-[12px] rounded-full pill-press whitespace-nowrap flex-shrink-0 ${
+              activeSport === sport
+                ? "bg-[#1a1a1a] text-white tab-active"
+                : "text-[#555] hover:text-[#888]"
+            }`}
+          >
+            {sport}
+          </button>
+        ))}
+      </div>
+
+      {/* Line Type Toggle */}
+      <div className="flex justify-center gap-1 mb-6 bg-[#111] rounded-full p-1 max-w-xs mx-auto">
+        {(["moneyline", "spread", "total"] as const).map((type) => (
+          <button
+            key={type}
+            onClick={() => setLineType(type)}
+            className={`flex-1 px-3 py-1.5 text-[11px] rounded-full capitalize pill-press ${
+              lineType === type
+                ? "bg-[#1a1a1a] text-white tab-active"
+                : "text-[#555] hover:text-[#888]"
+            }`}
+          >
+            {type === "total" ? "O/U" : type}
+          </button>
+        ))}
+      </div>
+
+      {error && !games.length && (
+        <div className="text-center py-16">
+          <p className="text-[14px] text-[#555] mb-2">No live data available</p>
+          <p className="text-[12px] text-[#444] max-w-sm mx-auto">{error}</p>
+        </div>
+      )}
+
+      {!error && filteredGames.length === 0 && (
+        <div className="text-center py-16">
+          <p className="text-[14px] text-[#555]">No games scheduled for {activeSport}</p>
+        </div>
+      )}
+
+      {/* Games grouped by sport */}
+      <div className="space-y-6">
+        {Object.entries(groupedBySport).map(([sport, sportGames]) => (
+          <div key={sport}>
+            {activeSport === "All" && (
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-[12px] text-[#555] uppercase tracking-wider font-medium">{sport}</span>
+                <div className="flex-1 h-px bg-[#1a1a1a]" />
+                <span className="text-[11px] text-[#444]">{sportGames.length} games</span>
+              </div>
+            )}
+
+            <div className="space-y-2 stagger-children">
+              {sportGames.map((game) => (
+                <div key={game.id} className="bg-[#1a1a1a] rounded-2xl p-4 card-hover">
+                  {/* Status badge */}
+                  <div className="flex justify-between items-center mb-3">
+                    {game.isLive ? (
+                      <span className="text-[11px] text-[#f87171] bg-[#2e1a1a] px-2.5 py-0.5 rounded-full animate-shimmer font-medium">
+                        LIVE
+                      </span>
+                    ) : game.completed ? (
+                      <span className="text-[11px] text-[#555] bg-[#222] px-2.5 py-0.5 rounded-full">
+                        FINAL
+                      </span>
+                    ) : (
+                      <span className="text-[11px] text-[#555]">
+                        {formatTime(game.startTime)}
+                      </span>
+                    )}
+                    {activeSport === "All" ? null : (
+                      <span className="text-[11px] text-[#444]">{game.sport}</span>
+                    )}
+                  </div>
+
+                  {/* Teams and Lines */}
+                  <div className="space-y-2">
+                    {/* Away Team */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <span className="text-[14px] text-white truncate">{game.awayTeam}</span>
+                        {game.awayScore !== null && (
+                          <span className="text-[16px] font-semibold text-white">{game.awayScore}</span>
+                        )}
+                      </div>
+                      <div className="flex-shrink-0 ml-4">
+                        {lineType === "moneyline" && (
+                          <span className={`text-[13px] font-medium px-3 py-1 rounded-lg bg-[#111] ${
+                            game.moneyline.away !== null && game.moneyline.away > 0 ? "text-[#4ade80]" : "text-[#888]"
+                          }`}>
+                            {formatOdds(game.moneyline.away)}
+                          </span>
+                        )}
+                        {lineType === "spread" && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-[12px] text-[#555]">
+                              {game.spread.awayPoint !== null ? (game.spread.awayPoint > 0 ? `+${game.spread.awayPoint}` : game.spread.awayPoint) : "—"}
+                            </span>
+                            <span className="text-[13px] font-medium text-[#888] px-2 py-1 rounded-lg bg-[#111]">
+                              {formatOdds(game.spread.away)}
+                            </span>
+                          </div>
+                        )}
+                        {lineType === "total" && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-[12px] text-[#555]">O {game.total.point ?? "—"}</span>
+                            <span className="text-[13px] font-medium text-[#888] px-2 py-1 rounded-lg bg-[#111]">
+                              {formatOdds(game.total.over)}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Divider */}
+                    <div className="h-px bg-[#222]" />
+
+                    {/* Home Team */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <span className="text-[14px] text-white truncate">{game.homeTeam}</span>
+                        {game.homeScore !== null && (
+                          <span className="text-[16px] font-semibold text-white">{game.homeScore}</span>
+                        )}
+                      </div>
+                      <div className="flex-shrink-0 ml-4">
+                        {lineType === "moneyline" && (
+                          <span className={`text-[13px] font-medium px-3 py-1 rounded-lg bg-[#111] ${
+                            game.moneyline.home !== null && game.moneyline.home > 0 ? "text-[#4ade80]" : "text-[#888]"
+                          }`}>
+                            {formatOdds(game.moneyline.home)}
+                          </span>
+                        )}
+                        {lineType === "spread" && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-[12px] text-[#555]">
+                              {game.spread.homePoint !== null ? (game.spread.homePoint > 0 ? `+${game.spread.homePoint}` : game.spread.homePoint) : "—"}
+                            </span>
+                            <span className="text-[13px] font-medium text-[#888] px-2 py-1 rounded-lg bg-[#111]">
+                              {formatOdds(game.spread.home)}
+                            </span>
+                          </div>
+                        )}
+                        {lineType === "total" && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-[12px] text-[#555]">U {game.total.point ?? "—"}</span>
+                            <span className="text-[13px] font-medium text-[#888] px-2 py-1 rounded-lg bg-[#111]">
+                              {formatOdds(game.total.under)}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Draw line for soccer */}
+                    {lineType === "moneyline" && game.moneyline.draw !== null && (
+                      <>
+                        <div className="h-px bg-[#222]" />
+                        <div className="flex items-center justify-between">
+                          <span className="text-[14px] text-[#555]">Draw</span>
+                          <span className="text-[13px] font-medium text-[#888] px-3 py-1 rounded-lg bg-[#111]">
+                            {formatOdds(game.moneyline.draw)}
+                          </span>
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
-                {profile && (
-                  <button onClick={startEditing} className="px-4 py-1.5 text-[12px] text-[#555] bg-[#222] hover:bg-[#2a2a2a] rounded-full pill-press">
-                    Edit
-                  </button>
-                )}
-              </div>
-              <div className="flex gap-5 mt-3 text-[12px] text-[#555]">
-                <button onClick={() => { setShowFollowers(!showFollowers); setShowFollowing(false); }} className="hover:text-[#888] transition-colors">
-                  <span className="text-white font-medium">{profile?._count.followers || 0}</span> followers
-                </button>
-                <button onClick={() => { setShowFollowing(!showFollowing); setShowFollowers(false); }} className="hover:text-[#888] transition-colors">
-                  <span className="text-white font-medium">{profile?._count.following || 0}</span> following
-                </button>
-                <span><span className="text-white font-medium">{profile?._count.bets || 0}</span> bets</span>
-              </div>
+              ))}
             </div>
           </div>
-        )}
-
-        {/* Followers/Following Lists */}
-        {showFollowers && (
-          <div className="mt-4 pt-4 border-t border-[#2a2a2a] animate-slide-down">
-            <p className="text-[12px] text-[#555] uppercase tracking-wider mb-3">Followers</p>
-            {followersList.length === 0 ? (
-              <p className="text-[13px] text-[#555]">No followers yet</p>
-            ) : (
-              <div className="space-y-2">
-                {followersList.map((u) => (
-                  <Link key={u.id} href={`/profile/${u.id}`} className="flex items-center gap-3 py-1.5 hover:bg-[#222] rounded-xl px-2 -mx-2 transition-all">
-                    <div className="w-8 h-8 rounded-full bg-[#2a2a2a] flex items-center justify-center overflow-hidden">
-                      {u.image ? <img src={u.image} alt="" className="w-full h-full object-cover" /> : <span className="text-[#555] text-xs">{u.name[0]}</span>}
-                    </div>
-                    <span className="text-[13px]">{u.name}</span>
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {showFollowing && (
-          <div className="mt-4 pt-4 border-t border-[#2a2a2a] animate-slide-down">
-            <p className="text-[12px] text-[#555] uppercase tracking-wider mb-3">Following</p>
-            {followingList.length === 0 ? (
-              <p className="text-[13px] text-[#555]">Not following anyone</p>
-            ) : (
-              <div className="space-y-2">
-                {followingList.map((u) => (
-                  <Link key={u.id} href={`/profile/${u.id}`} className="flex items-center gap-3 py-1.5 hover:bg-[#222] rounded-xl px-2 -mx-2 transition-all">
-                    <div className="w-8 h-8 rounded-full bg-[#2a2a2a] flex items-center justify-center overflow-hidden">
-                      {u.image ? <img src={u.image} alt="" className="w-full h-full object-cover" /> : <span className="text-[#555] text-xs">{u.name[0]}</span>}
-                    </div>
-                    <span className="text-[13px]">{u.name}</span>
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-
-      <div className="grid grid-cols-3 md:grid-cols-6 gap-2 mb-8 stagger-children">
-        <StatsCard label="Total" value={totalBets} />
-        <StatsCard label="Win Rate" value={`${winRate.toFixed(1)}%`} color={winRate >= 50 ? "text-green-600" : "text-red-600"} />
-        <StatsCard label="Wins" value={wonBets} color="text-green-600" />
-        <StatsCard label="Losses" value={lostBets} color="text-red-600" />
-        <StatsCard label="Profit" value={totalProfit} color={totalProfit >= 0 ? "text-green-600" : "text-red-600"} />
-        <StatsCard label="ROI" value={`${roi.toFixed(1)}%`} color={roi >= 0 ? "text-green-600" : "text-red-600"} />
-      </div>
-
-      <div className="flex justify-between items-center mb-4">
-        <div className="flex justify-center gap-2 flex-1">
-          {(["today", "upcoming", "futures"] as const).map((t) => (
-            <button
-              key={t}
-              onClick={() => setTab(t)}
-              className={`px-4 py-1.5 text-[13px] rounded-full pill-press capitalize ${
-                tab === t ? "bg-[#1a1a1a] text-white tab-active" : "text-[#555] hover:text-[#888]"
-              }`}
-            >
-              {t}
-            </button>
-          ))}
-        </div>
-        <div className="flex gap-2">
-          <Link href="/bets/new" className="px-4 py-1.5 text-[13px] text-[#888] bg-[#1a1a1a] hover:bg-[#222] rounded-full pill-press">
-            + Bet
-          </Link>
-          <Link href="/parlays/new" className="px-4 py-1.5 text-[13px] text-[#888] bg-[#1a1a1a] hover:bg-[#222] rounded-full pill-press">
-            + Parlay
-          </Link>
-        </div>
-      </div>
-
-      <div>
-        {filteredBets.length === 0 && filteredParlays.length === 0 ? (
-          <div className="text-center py-16">
-            <p className="text-[14px] text-[#555] mb-4">No {tab} games</p>
-            <Link href="/bets/new" className="text-[13px] text-[#888] hover:text-white transition-colors">
-              Place a bet
-            </Link>
-          </div>
-        ) : (
-          <>
-            {filteredBets.map((bet) => (
-              <BetCard key={bet.id} bet={bet} showUser={false} onUpdate={fetchData} />
-            ))}
-            {filteredParlays.map((parlay) => (
-              <ParlayCard key={parlay.id} parlay={parlay} showUser={false} />
-            ))}
-          </>
-        )}
+        ))}
       </div>
     </div>
   );
