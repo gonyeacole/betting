@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, use } from "react";
+import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
@@ -74,8 +74,7 @@ interface GameDetail {
   teamStats: TeamStats[];
 }
 
-export default function GameDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
+function GameDetailContent({ id }: { id: string }) {
   const searchParams = useSearchParams();
   const sport = searchParams.get("sport") || "mlb";
   const [game, setGame] = useState<GameDetail | null>(null);
@@ -296,5 +295,13 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
         </div>
       )}
     </div>
+  );
+}
+
+export default function GameDetailPage({ params }: { params: { id: string } }) {
+  return (
+    <Suspense fallback={<div className="animate-fade-in-up text-center py-20"><div className="text-[14px] text-[#555] animate-shimmer">Loading...</div></div>}>
+      <GameDetailContent id={params.id} />
+    </Suspense>
   );
 }
